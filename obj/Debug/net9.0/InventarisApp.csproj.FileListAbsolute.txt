@@ -183,3 +183,4 @@ C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\refint\InventarisApp.
 C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\InventarisApp.pdb
 C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\InventarisApp.genruntimeconfig.cache
 C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\ref\InventarisApp.dll
+C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\InventarisApp.sourcelink.json
