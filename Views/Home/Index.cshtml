@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="bi bi-pc-display" style="font-size: 5rem; background: linear-gradient(135deg, #6366f1, #14b8a6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;"></i>
+    </div>
+    <h1 class="display-5 fw-bold text-gradient mb-3" style="font-family: 'Outfit', sans-serif;">Welkom bij InventarisApp</h1>
+    <p class="text-muted mb-5" style="font-size: 1.1rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+        Beheer en bekijk alle devices, wifi-adapters en locaties vanuit één overzicht.
+    </p>
+    <a asp-controller="Device" asp-action="Index" class="btn btn-primary px-4 py-2">
+        <i class="bi bi-laptop me-2"></i>Bekijk Devices
+    </a>
+</div>

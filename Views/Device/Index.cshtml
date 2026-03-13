@@ -1,0 +1,88 @@
+@model IEnumerable<InventarisApp.Models.Info>
+
+@{
+    ViewData["Title"] = "Apparaten Overzicht";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-gradient" style="font-family: 'Outfit', sans-serif;">Apparaten Inventaris</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Nieuw Apparaat Toevoegen
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Type</th>
+                    <th>ID</th>
+                    <th>Merk</th>
+                    <th>Model</th>
+                    <th>Serienummer</th>
+                    <th>IP-adres</th>
+                    <th>Status</th>
+                    <th>Lokaal</th>
+                    <th>Locatie</th>
+                    <th class="text-center">Acties</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@item.type</td>
+                        <td>@item.device_id</td>
+                        <td>@item.merk</td>
+                        <td>@item.model</td>
+                        <td>@item.serial_number</td>
+                        <td><code>@item.ip</code></td>
+                        <td>
+                            @{
+                                var badgeClass = item.status switch
+                                {
+                                    "Active" => "bg-success text-white",
+                                    "Inactive" => "bg-secondary text-white",
+                                    "Maintenance" => "bg-warning text-dark",
+                                    _ => "bg-light text-dark"
+                                };
+                                var statusLabel = item.status switch
+                                {
+                                    "Active" => "Actief",
+                                    "Inactive" => "Inactief",
+                                    "Maintenance" => "Onderhoud",
+                                    _ => item.status
+                                };
+                            }
+                            <span class="badge @badgeClass">
+                                @statusLabel
+                            </span>
+                        </td>
+                        <td>@item.lokaalnr</td>
+                        <td>@(item.Lokaal?.Locatie?.naam ?? "N.v.t.")</td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a asp-action="Edit" asp-route-type="@item.type" asp-route-deviceId="@item.device_id" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i> Bewerken
+                                </a>
+                                <form asp-action="Delete" asp-route-type="@item.type" asp-route-deviceId="@item.device_id" method="post" class="d-inline" onsubmit="return confirm('Weet je zeker dat je dit apparaat wilt verwijderen?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Verwijderen
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                
+                @if(!Model.Any())
+                {
+                    <tr>
+                        <td colspan="10" class="text-center py-5 bg-light text-muted">Geen apparaten gevonden in de inventaris.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

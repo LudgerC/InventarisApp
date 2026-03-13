@@ -1,0 +1,132 @@
+@model InventarisApp.Models.Info
+
+@{
+    ViewData["Title"] = "Add Device";
+    var lokalen = ViewBag.Lokalen as List<InventarisApp.Models.Lokaal> ?? new List<InventarisApp.Models.Lokaal>();
+}
+
+<div class="row min-vh-100 align-items-center justify-content-center bg-light">
+    <div class="col-md-8 col-lg-6 py-5">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                <h3 class="mb-0 fw-bold">Nieuw Apparaat Toevoegen</h3>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <h5 class="text-primary border-bottom pb-2 mb-3">Basis Informatie</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="type" class="form-control" placeholder="Type" />
+                            <label asp-for="type" class="ms-2">Apparaat Type</label>
+                            <span asp-validation-for="type" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="device_id" class="form-control" placeholder="Device ID" />
+                            <label asp-for="device_id" class="ms-2">Apparaat ID</label>
+                            <span asp-validation-for="device_id" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="merk" class="form-control" placeholder="Merk" />
+                            <label asp-for="merk" class="ms-2">Merk</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="model" class="form-control" placeholder="Model" />
+                            <label asp-for="model" class="ms-2">Model</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="serial_number" class="form-control" placeholder="Serienummer" />
+                            <label asp-for="serial_number" class="ms-2">Serienummer</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="ip" class="form-control" placeholder="IP-adres" />
+                            <label asp-for="ip" class="ms-2">IP-adres</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <select asp-for="status" class="form-select">
+                                <option value="">-- Selecteer Status --</option>
+                                <option value="Active">Actief</option>
+                                <option value="Inactive">Inactief</option>
+                                <option value="Maintenance">Onderhoud</option>
+                            </select>
+                            <label asp-for="status" class="ms-2">Status</label>
+                        </div>
+                    </div>
+
+                    <h5 class="text-primary border-bottom pb-2 mt-4 mb-3">Locatie</h5>
+                    <div class="row g-3">
+                        <div class="col-12 form-floating mb-3">
+                            <select name="locationSelection" id="locationSelection" class="form-select" onchange="updateLocationValues()">
+                                <option value="">-- Selecteer Lokaal / Locatie --</option>
+                                @foreach (var lokaal in lokalen)
+                                {
+                                    <option value="@lokaal.locatie_id|@lokaal.lokaalnr">@lokaal.lokaalnr (@lokaal.Locatie?.naam)</option>
+                                }
+                            </select>
+                            <label for="locationSelection" class="ms-2">Toewijzen aan Lokaal</label>
+                            <!-- Hidden inputs to bind to model -->
+                            <input type="hidden" asp-for="locatie_id" id="hiddenLocatieId" />
+                            <input type="hidden" asp-for="lokaalnr" id="hiddenLokaalnr" />
+                            <span asp-validation-for="lokaalnr" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    
+                    <h5 class="text-primary border-bottom pb-2 mt-4 mb-3">Aankoop Informatie</h5>
+                    <div class="row g-3">
+                         <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="leverancier" class="form-control" placeholder="Leverancier" />
+                            <label asp-for="leverancier" class="ms-2">Leverancier</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="garantie" class="form-control" placeholder="Garantie" type="number" />
+                            <label asp-for="garantie" class="ms-2">Garantie (Maanden)</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="aankoopdatum" class="form-control" type="date" />
+                            <label asp-for="aankoopdatum" class="ms-2">Aankoopdatum</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="eind_garantie" class="form-control" type="date" />
+                            <label asp-for="eind_garantie" class="ms-2">Einde Garantie</label>
+                        </div>
+                    </div>
+
+                    <h5 class="text-primary border-bottom pb-2 mt-4 mb-3">Optionele WiFi</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 form-floating mb-3">
+                            <input name="mac_address" class="form-control" placeholder="MAC" />
+                            <label for="mac_address" class="ms-2">MAC-adres</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input name="local_ip" class="form-control" placeholder="Lokaal IP" />
+                            <label for="local_ip" class="ms-2">Lokaal IP-adres</label>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Annuleren</a>
+                        <button type="submit" class="btn btn-primary px-5 shadow-sm">Apparaat Opslaan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function updateLocationValues() {
+            var selected = document.getElementById("locationSelection").value;
+            if (selected) {
+                var parts = selected.split('|');
+                document.getElementById("hiddenLocatieId").value = parts[0];
+                document.getElementById("hiddenLokaalnr").value = parts[1];
+            } else {
+                document.getElementById("hiddenLocatieId").value = "";
+                document.getElementById("hiddenLokaalnr").value = "";
+            }
+        }
+    </script>
+}

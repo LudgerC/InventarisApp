@@ -1,0 +1,115 @@
+@model InventarisApp.Models.Info
+
+@{
+    ViewData["Title"] = "Edit Device";
+    var lokalen = ViewBag.Lokalen as List<InventarisApp.Models.Lokaal> ?? new List<InventarisApp.Models.Lokaal>();
+    
+    // Set initial select value string
+    string selectedLocationValue = $"{Model.locatie_id}|{Model.lokaalnr}";
+}
+
+<div class="row min-vh-100 align-items-center justify-content-center bg-light">
+    <div class="col-md-8 col-lg-6 py-5">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-secondary text-white text-center py-3 rounded-top-4">
+                <h3 class="mb-0 fw-bold">Apparaat Bewerken - @Model.device_id</h3>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <!-- Read-only composite key -->
+                    <input type="hidden" asp-for="type" />
+                    <input type="hidden" asp-for="device_id" />
+                    <input type="hidden" name="type" value="@Model.type" />
+                    <input type="hidden" name="device_id" value="@Model.device_id" />
+                    
+                    <!-- Include other hidden props that shouldn't change -->
+                    <input type="hidden" asp-for="aankoopdatum" />
+                    <input type="hidden" asp-for="eind_garantie" />
+                    <input type="hidden" asp-for="garantie" />
+                    <input type="hidden" asp-for="merk" />
+                    <input type="hidden" asp-for="serial_number" />
+
+                    <div class="alert alert-info py-2 mb-4 shadow-sm border-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Type:</strong> @Model.type <br/>
+                        <i class="bi bi-tag me-2"></i>
+                        <strong>Merk:</strong> @Model.merk <br/>
+                        <i class="bi bi-hash me-2"></i>
+                        <strong>Serienummer:</strong> @Model.serial_number
+                    </div>
+
+                    <h5 class="text-secondary border-bottom pb-2 mb-3">Bewerkbare Gegevens</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="model" class="form-control" placeholder="Model" />
+                            <label asp-for="model" class="ms-2">Model</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="ip" class="form-control" placeholder="IP-adres" />
+                            <label asp-for="ip" class="ms-2">IP-adres</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <select asp-for="status" class="form-select">
+                                <option value="Active">Actief</option>
+                                <option value="Inactive">Inactief</option>
+                                <option value="Maintenance">Onderhoud</option>
+                            </select>
+                            <label asp-for="status" class="ms-2">Status</label>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="leverancier" class="form-control" placeholder="Leverancier" />
+                            <label asp-for="leverancier" class="ms-2">Leverancier</label>
+                        </div>
+                    </div>
+
+                    <h5 class="text-secondary border-bottom pb-2 mt-4 mb-3">Locatie</h5>
+                    <div class="row g-3">
+                        <div class="col-12 form-floating mb-3">
+                            <select name="locationSelection" id="locationSelection" class="form-select" onchange="updateLocationValues()">
+                                <option value="">-- Selecteer Lokaal / Locatie --</option>
+                                @foreach (var lokaal in lokalen)
+                                {
+                                    var val = $"{lokaal.locatie_id}|{lokaal.lokaalnr}";
+                                    if(val == selectedLocationValue) {
+                                        <option value="@val" selected="selected">@lokaal.lokaalnr (@lokaal.Locatie?.naam)</option>
+                                    } else {
+                                        <option value="@val">@lokaal.lokaalnr (@lokaal.Locatie?.naam)</option>
+                                    }
+                                }
+                            </select>
+                            <label for="locationSelection" class="ms-2">Toewijzen aan Lokaal</label>
+                            
+                            <input type="hidden" asp-for="locatie_id" id="hiddenLocatieId" />
+                            <input type="hidden" asp-for="lokaalnr" id="hiddenLokaalnr" />
+                            <span asp-validation-for="lokaalnr" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Annuleren</a>
+                        <button type="submit" class="btn btn-primary px-5 shadow-sm">Apparaat Bijwerken</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function updateLocationValues() {
+            var selected = document.getElementById("locationSelection").value;
+            if (selected) {
+                var parts = selected.split('|');
+                document.getElementById("hiddenLocatieId").value = parts[0];
+                document.getElementById("hiddenLokaalnr").value = parts[1];
+            } else {
+                document.getElementById("hiddenLocatieId").value = "";
+                document.getElementById("hiddenLokaalnr").value = "";
+            }
+        }
+    </script>
+}
