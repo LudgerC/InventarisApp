@@ -47,23 +47,30 @@ namespace InventarisApp.Services
 
         public async Task<bool> AddDeviceAsync(Info info)
         {
-            // First check if the device already exists, if not, add it
-            var device = await _context.Devices.FindAsync(info.device_id);
-            if (device == null)
-            {
-                device = new Device { device_id = info.device_id, type = info.type };
-                _context.Devices.Add(device);
-            }
-
-            _context.Infos.Add(info);
-
             try
             {
+                // Ensure location IDs are null if empty strings were passed
+                if (string.IsNullOrEmpty(info.lokaalnr)) info.lokaalnr = null;
+                if (info.locatie_id == 0) info.locatie_id = null;
+
+                // Create a new Device record to get an automatically generated ID
+                var device = new Device { type = info.type ?? "Unknown" };
+                _context.Devices.Add(device);
+                
+                // Save to generate the ID
+                await _context.SaveChangesAsync();
+                
+                // Assign the generated ID to the Info record
+                info.device_id = device.device_id;
+                _context.Infos.Add(info);
+
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                // Log exception if needed (can be seen in debugger/output)
+                System.Diagnostics.Debug.WriteLine($"Error adding device: {ex.Message}");
                 return false;
             }
         }
@@ -79,16 +86,18 @@ namespace InventarisApp.Services
                 return false;
             }
 
-            // Update allowed fields (model, ip, status, leverancier, locatie/lokaal)
+            // Update allowed fields
+            existingInfo.merk = info.merk;
             existingInfo.model = info.model;
             existingInfo.ip = info.ip;
             existingInfo.status = info.status;
+            existingInfo.serial_number = info.serial_number;
             existingInfo.leverancier = info.leverancier;
             existingInfo.locatie_id = info.locatie_id;
             existingInfo.lokaalnr = info.lokaalnr;
-            
-            // Note: merk, serial_number, aankoopdatum, eind_garantie were not specifically mentioned in "Edit device" 
-            // but we could update them if needed. Sticking to the requirement for now.
+            existingInfo.garantie = info.garantie;
+            existingInfo.aankoopdatum = info.aankoopdatum;
+            existingInfo.eind_garantie = info.eind_garantie;
 
             // Optional Wifi update logic could go here if needed later
 

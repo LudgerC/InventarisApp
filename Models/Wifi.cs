@@ -16,13 +16,13 @@ namespace InventarisApp.Models
         public int device_id { get; set; }
         
         [MaxLength(100)]
-        public string mac_address { get; set; }
+        public string? mac_address { get; set; }
         
         [MaxLength(50)]
-        public string local_ip { get; set; }
+        public string? local_ip { get; set; }
         
         // Navigation property
         [ForeignKey("type,device_id")]
-        public Info Info { get; set; }
+        public Info? Info { get; set; }
     }
 }

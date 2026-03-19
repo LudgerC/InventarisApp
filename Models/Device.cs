@@ -13,6 +13,6 @@ namespace InventarisApp.Models
         public string type { get; set; }
         
         // Navigation property
-        public ICollection<Info> Infos { get; set; } = new List<Info>();
+        public ICollection<Info>? Infos { get; set; } = new List<Info>();
     }
 }

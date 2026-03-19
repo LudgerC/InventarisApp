@@ -63,6 +63,17 @@ namespace InventarisApp.Database
                 .WithMany(i => i.Wifis)
                 .HasForeignKey(w => new { w.type, w.device_id })
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Seed Opslag data
+            modelBuilder.Entity<Locatie>().HasData(
+                new Locatie { locatie_id = 1, naam = "Campus Rouppe", abbreviation = "CR" },
+                new Locatie { locatie_id = 2, naam = "Campus Landsroem", abbreviation = "CL" }
+            );
+
+            modelBuilder.Entity<Lokaal>().HasData(
+                new Lokaal { locatie_id = 1, lokaalnr = "Opslag", plaatsen = 0 },
+                new Lokaal { locatie_id = 2, lokaalnr = "Opslag", plaatsen = 0 }
+            );
         }
     }
 }

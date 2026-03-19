@@ -1,0 +1,13 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+C:\Users\ludge\source\repos\InventarisApp\Program.cs(7,1): error CS8802: Only one compilation unit can have top-level statements. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+
+Build FAILED.
+
+C:\Users\ludge\source\repos\InventarisApp\Program.cs(7,1): error CS8802: Only one compilation unit can have top-level statements. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:01.69
+
+Workload updates are available. Run `dotnet workload list` for more information.

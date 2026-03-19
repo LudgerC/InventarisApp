@@ -26,14 +26,21 @@ namespace InventarisApp.Controllers
 
         public async Task<IActionResult> Create()
         {
+            ViewBag.Locaties = await _context.Locaties.ToListAsync();
             ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Info info, string mac_address, string local_ip)
+        public async Task<IActionResult> Create(Info info, string? mac_address, string? local_ip)
         {
+            // Remove navigation properties from validation as they are handled server-side
+            ModelState.Remove("Device");
+            ModelState.Remove("Lokaal");
+            ModelState.Remove("info.Device");
+            ModelState.Remove("info.Lokaal");
+            
             if (ModelState.IsValid)
             {
                 if (!string.IsNullOrEmpty(mac_address) || !string.IsNullOrEmpty(local_ip))
@@ -50,10 +57,17 @@ namespace InventarisApp.Controllers
                 bool result = await _deviceService.AddDeviceAsync(info);
                 if (result)
                 {
+                    TempData["Success"] = "Apparaat succesvol toegevoegd!";
                     return RedirectToAction(nameof(Index));
                 }
-                ModelState.AddModelError("", "Unable to save device.");
+                TempData["Error"] = "Fout bij het opslaan: Database kon de gegevens niet verwerken.";
             }
+            else
+            {
+                var errors = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                TempData["Error"] = $"Validatie fout: {errors}";
+            }
+            ViewBag.Locaties = await _context.Locaties.ToListAsync();
             ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
             return View(info);
         }
@@ -71,6 +85,7 @@ namespace InventarisApp.Controllers
                 return NotFound();
             }
 
+            ViewBag.Locaties = await _context.Locaties.ToListAsync();
             ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
             return View(info);
         }
@@ -84,15 +99,27 @@ namespace InventarisApp.Controllers
                 return NotFound();
             }
 
+            ModelState.Remove("Device");
+            ModelState.Remove("Lokaal");
+            ModelState.Remove("info.Device");
+            ModelState.Remove("info.Lokaal");
+
             if (ModelState.IsValid)
             {
                 bool result = await _deviceService.UpdateDeviceAsync(info);
                 if (result)
                 {
+                    TempData["Success"] = "Apparaat succesvol bijgewerkt!";
                     return RedirectToAction(nameof(Index));
                 }
-                ModelState.AddModelError("", "Unable to update device.");
+                TempData["Error"] = "Fout bij het bijwerken in de database.";
             }
+            else
+            {
+                var errors = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                TempData["Error"] = $"Validatie fout: {errors}";
+            }
+            ViewBag.Locaties = await _context.Locaties.ToListAsync();
             ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
             return View(info);
         }

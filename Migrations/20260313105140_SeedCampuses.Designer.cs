@@ -4,6 +4,7 @@ using InventarisApp.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventarisApp.Migrations
 {
     [DbContext(typeof(InventarisContext))]
-    partial class InventarisContextModelSnapshot : ModelSnapshot
+    [Migration("20260313105140_SeedCampuses")]
+    partial class SeedCampuses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,6 +136,12 @@ namespace InventarisApp.Migrations
                             locatie_id = 2,
                             abbreviation = "CL",
                             naam = "Campus Landsroem"
+                        },
+                        new
+                        {
+                            locatie_id = 999,
+                            abbreviation = "IO",
+                            naam = "Interne Opslag"
                         });
                 });
 
@@ -155,13 +164,7 @@ namespace InventarisApp.Migrations
                     b.HasData(
                         new
                         {
-                            locatie_id = 1,
-                            lokaalnr = "Opslag",
-                            plaatsen = 0
-                        },
-                        new
-                        {
-                            locatie_id = 2,
+                            locatie_id = 999,
                             lokaalnr = "Opslag",
                             plaatsen = 0
                         });

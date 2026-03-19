@@ -4,6 +4,7 @@ using InventarisApp.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventarisApp.Migrations
 {
     [DbContext(typeof(InventarisContext))]
-    partial class InventarisContextModelSnapshot : ModelSnapshot
+    [Migration("20260313092248_MakeLocationNullable")]
+    partial class MakeLocationNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,14 +59,16 @@ namespace InventarisApp.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("eind garantie");
 
-                    b.Property<int?>("garantie")
+                    b.Property<int>("garantie")
                         .HasColumnType("int");
 
                     b.Property<string>("ip")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("leverancier")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
@@ -74,19 +79,23 @@ namespace InventarisApp.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("merk")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
                     b.Property<string>("model")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
                     b.Property<string>("serial_number")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")
                         .HasColumnName("serial number");
 
                     b.Property<string>("status")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
@@ -120,20 +129,6 @@ namespace InventarisApp.Migrations
                     b.HasKey("locatie_id");
 
                     b.ToTable("Locaties");
-
-                    b.HasData(
-                        new
-                        {
-                            locatie_id = 1,
-                            abbreviation = "CR",
-                            naam = "Campus Rouppe"
-                        },
-                        new
-                        {
-                            locatie_id = 2,
-                            abbreviation = "CL",
-                            naam = "Campus Landsroem"
-                        });
                 });
 
             modelBuilder.Entity("InventarisApp.Models.Lokaal", b =>
@@ -151,20 +146,6 @@ namespace InventarisApp.Migrations
                     b.HasKey("locatie_id", "lokaalnr");
 
                     b.ToTable("Lokalen");
-
-                    b.HasData(
-                        new
-                        {
-                            locatie_id = 1,
-                            lokaalnr = "Opslag",
-                            plaatsen = 0
-                        },
-                        new
-                        {
-                            locatie_id = 2,
-                            lokaalnr = "Opslag",
-                            plaatsen = 0
-                        });
                 });
 
             modelBuilder.Entity("InventarisApp.Models.Wifi", b =>
@@ -179,10 +160,12 @@ namespace InventarisApp.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("local_ip")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("mac_address")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 

@@ -1,8 +1,21 @@
+using System.Globalization;
 using InventarisApp.Database;
 using InventarisApp.Services;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Set the default culture to Dutch (Netherlands)
+var defaultCulture = new CultureInfo("nl-NL");
+defaultCulture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+defaultCulture.DateTimeFormat.DateSeparator = "/";
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(defaultCulture),
+    SupportedCultures = new List<CultureInfo> { defaultCulture },
+    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+};
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -26,6 +39,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRequestLocalization(localizationOptions);
 app.UseRouting();
 
 app.UseAuthorization();

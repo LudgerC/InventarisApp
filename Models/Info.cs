@@ -15,42 +15,44 @@ namespace InventarisApp.Models
         public int device_id { get; set; }
         
         // Foreign Key to Lokaal
-        public int locatie_id { get; set; }
-        [Required]
-        [MaxLength(50)]
-        public string lokaalnr { get; set; }
+        public int? locatie_id { get; set; }
+        public string? lokaalnr { get; set; }
         
         // Data properties
         [MaxLength(100)]
-        public string merk { get; set; }
+        public string? merk { get; set; }
         
         [MaxLength(50)]
-        public string ip { get; set; }
+        public string? ip { get; set; }
         
         [MaxLength(100)]
-        public string model { get; set; }
+        public string? model { get; set; }
         
         [MaxLength(100)]
-        public string serial_number { get; set; }
+        public string? serial_number { get; set; }
         
         [MaxLength(50)]
-        public string status { get; set; }
+        public string? status { get; set; }
         
-        public int garantie { get; set; }
+        public int? garantie { get; set; }
         
         [MaxLength(100)]
-        public string leverancier { get; set; }
+        public string? leverancier { get; set; }
         
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? aankoopdatum { get; set; }
         
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? eind_garantie { get; set; }
         
         // Navigation properties
         [ForeignKey("device_id")]
-        public Device Device { get; set; }
+        public Device? Device { get; set; }
         
         [ForeignKey("locatie_id,lokaalnr")]
-        public Lokaal Lokaal { get; set; }
+        public Lokaal? Lokaal { get; set; }
         
         public ICollection<Wifi> Wifis { get; set; } = new List<Wifi>();
     }

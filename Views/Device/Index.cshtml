@@ -25,6 +25,7 @@
                     <th>Status</th>
                     <th>Lokaal</th>
                     <th>Locatie</th>
+                    <th>Garantie Tot</th>
                     <th class="text-center">Acties</th>
                 </tr>
             </thead>
@@ -59,8 +60,9 @@
                                 @statusLabel
                             </span>
                         </td>
-                        <td>@item.lokaalnr</td>
+                        <td>@(item.lokaalnr ?? "In Opslag")</td>
                         <td>@(item.Lokaal?.Locatie?.naam ?? "N.v.t.")</td>
+                        <td>@(item.eind_garantie?.ToString("dd/MM/yyyy") ?? "N.v.t.")</td>
                         <td class="text-center">
                             <div class="btn-group">
                                 <a asp-action="Edit" asp-route-type="@item.type" asp-route-deviceId="@item.device_id" class="btn btn-sm btn-outline-secondary">

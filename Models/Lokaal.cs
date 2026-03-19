@@ -17,8 +17,8 @@ namespace InventarisApp.Models
         
         // Navigation properties
         [ForeignKey("locatie_id")]
-        public Locatie Locatie { get; set; }
+        public Locatie? Locatie { get; set; }
         
-        public ICollection<Info> Infos { get; set; } = new List<Info>();
+        public ICollection<Info>? Infos { get; set; } = new List<Info>();
     }
 }
