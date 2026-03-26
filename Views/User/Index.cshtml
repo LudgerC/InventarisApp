@@ -1,0 +1,98 @@
+@model IEnumerable<InventarisApp.Models.User>
+
+@{
+    ViewData["Title"] = "Gebruikers Beheren";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Gebruikers</h1>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-person-plus"></i> Nieuwe Gebruiker</a>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Gebruikersnaam</th>
+                        <th>Rol</th>
+                        <th>Status</th>
+                        <th>Acties</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Username</td>
+                            <td>
+                                @if (item.Role == "Admin")
+                                {
+                                    <span class="badge bg-danger">Admin</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Personeel</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success">Actief</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Geblokkeerd</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.Username != User.Identity?.Name)
+                                {
+                                    <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                        @if (item.IsActive)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Blokkeren">
+                                                <i class="bi bi-slash-circle"></i> Blokkeren
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Deblokkeren">
+                                                <i class="bi bi-check-circle"></i> Deblokkeren
+                                            </button>
+                                        }
+                                    </form>
+                                    <form asp-action="ChangeRole" asp-route-id="@item.Id" method="post" class="d-inline ms-1">
+                                        @if (item.Role == "Admin")
+                                        {
+                                            <input type="hidden" name="targetRole" value="Personeel" />
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Maak Personeel">
+                                                <i class="bi bi-person-down"></i> Maak Personeel
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <input type="hidden" name="targetRole" value="Admin" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary" title="Maak Admin">
+                                                <i class="bi bi-person-up"></i> Maak Admin
+                                            </button>
+                                        }
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

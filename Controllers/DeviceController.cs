@@ -1,12 +1,14 @@
 using InventarisApp.Database;
 using InventarisApp.Models;
 using InventarisApp.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace InventarisApp.Controllers
 {
+    [Authorize]
     public class DeviceController : Controller
     {
         private readonly IDeviceService _deviceService;

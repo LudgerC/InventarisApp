@@ -14,6 +14,7 @@ namespace InventarisApp.Database
         public DbSet<Device> Devices { get; set; }
         public DbSet<Info> Infos { get; set; }
         public DbSet<Wifi> Wifis { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -73,6 +74,19 @@ namespace InventarisApp.Database
             modelBuilder.Entity<Lokaal>().HasData(
                 new Lokaal { locatie_id = 1, lokaalnr = "Opslag", plaatsen = 0 },
                 new Lokaal { locatie_id = 2, lokaalnr = "Opslag", plaatsen = 0 }
+            );
+
+            // Seed Admin data
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    Username = "admin",
+                    // Hashed "Admin123!" using BCrypt
+                    PasswordHash = "$2a$11$eNfFxyOQ/7o76hXwE/18/.M9v2vDkY6m8tP51BwEZyV44Qx74o77G",
+                    Role = "Admin",
+                    IsActive = true
+                }
             );
         }
     }

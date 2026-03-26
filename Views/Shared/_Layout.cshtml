@@ -36,18 +36,63 @@
 
                 <div class="navbar-collapse collapse">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                        <li class="nav-item">
-                            <a class="nav-link @((string?)ViewData["Title"] == "Home" ? "active" : "")"
-                               asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house me-1"></i>Home
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @((string?)ViewData["Title"] == "Devices" ? "active" : "")"
-                               asp-area="" asp-controller="Device" asp-action="Index">
-                                <i class="bi bi-laptop me-1"></i>Apparaten
-                            </a>
-                        </li>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @((string?)ViewData["Title"] == "Home" ? "active" : "")"
+                                   asp-area="" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house me-1"></i>Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @((string?)ViewData["Title"] == "Devices" ? "active" : "")"
+                                   asp-area="" asp-controller="Device" asp-action="Index">
+                                    <i class="bi bi-laptop me-1"></i>Apparaten
+                                </a>
+                            </li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @((string?)ViewData["Title"] == "Gebruikers Beheren" ? "active" : "")"
+                                       asp-area="" asp-controller="User" asp-action="Index">
+                                        <i class="bi bi-people me-1"></i>Gebruikers
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul>
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                            <i class="bi bi-person-gear me-1"></i>Mijn Profiel
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                            <button type="submit" class="dropdown-item text-danger border-0 bg-transparent w-100 text-start">
+                                                <i class="bi bi-box-arrow-right me-1"></i>Uitloggen
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>Inloggen
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

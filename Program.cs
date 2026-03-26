@@ -20,10 +20,19 @@ var localizationOptions = new RequestLocalizationOptions
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+    });
+
 builder.Services.AddDbContext<InventarisContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("LocalConnection");
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    // Gebruik een vaste versie om fouten tijdens 'dotnet ef' commando's te voorkomen als de DB niet bereikbaar is.
+    var serverVersion = new MySqlServerVersion(new Version(8, 0, 35));
+    options.UseMySql(connectionString, serverVersion);
 });
 
 builder.Services.AddScoped<IDeviceService, DeviceService>();
@@ -42,6 +51,7 @@ app.UseHttpsRedirection();
 app.UseRequestLocalization(localizationOptions);
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
