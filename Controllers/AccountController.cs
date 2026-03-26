@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -69,6 +70,43 @@ namespace InventarisApp.Controllers
             return RedirectToAction("Login", "Account");
         }
         
+        [HttpGet]
+        [Authorize]
+        public IActionResult Profile()
+        {
+            return View(new ChangePasswordViewModel());
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Profile", model);
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == User.Identity!.Name);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(model.CurrentPassword, user.PasswordHash))
+            {
+                ModelState.AddModelError("CurrentPassword", "Het huidige wachtwoord is onjuist.");
+                return View("Profile", model);
+            }
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+            _context.Update(user);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Je wachtwoord is succesvol gewijzigd!";
+            return RedirectToAction("Profile");
+        }
+
         [HttpGet]
         public IActionResult AccessDenied()
         {

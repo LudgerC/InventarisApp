@@ -78,5 +78,41 @@ namespace InventarisApp.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeRole(int id, string targetRole)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Prevent admin from changing their own role
+            if (user.Username == User.Identity?.Name)
+            {
+                TempData["Error"] = "Je kan je eigen rol niet wijzigen.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // If changing from Admin to something else, check if it's the last active admin
+            if (user.Role == "Admin" && targetRole != "Admin")
+            {
+                var adminCount = await _context.Users.CountAsync(u => u.Role == "Admin" && u.IsActive);
+                if (adminCount <= 1)
+                {
+                    TempData["Error"] = "Er moet altijd minstens één actieve beheerder (Admin) overblijven.";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+            user.Role = targetRole;
+            _context.Update(user);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Rol van {user.Username} is gewijzigd naar {targetRole}.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

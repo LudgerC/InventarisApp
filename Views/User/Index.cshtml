@@ -71,6 +71,22 @@
                                             </button>
                                         }
                                     </form>
+                                    <form asp-action="ChangeRole" asp-route-id="@item.Id" method="post" class="d-inline ms-1">
+                                        @if (item.Role == "Admin")
+                                        {
+                                            <input type="hidden" name="targetRole" value="Personeel" />
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Maak Personeel">
+                                                <i class="bi bi-person-down"></i> Maak Personeel
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <input type="hidden" name="targetRole" value="Admin" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary" title="Maak Admin">
+                                                <i class="bi bi-person-up"></i> Maak Admin
+                                            </button>
+                                        }
+                                    </form>
                                 }
                             </td>
                         </tr>
