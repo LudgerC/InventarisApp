@@ -559,3 +559,4 @@ C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\AntInventarisA
 C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\AntInventarisApp\InventarisApp\obj\Debug\net9.0\InventarisApp.pdb
 C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\AntInventarisApp\InventarisApp\obj\Debug\net9.0\InventarisApp.genruntimeconfig.cache
 C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\AntInventarisApp\InventarisApp\obj\Debug\net9.0\ref\InventarisApp.dll
+C:\Users\ludge\source\repos\InventarisApp\bin\Debug\net9.0\BCrypt.Net-Next.dll
