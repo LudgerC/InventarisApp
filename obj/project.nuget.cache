@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "amw7Yky03vA=",
+  "dgSpecHash": "46cDpqwVtmY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\InventApp\\InventarisApp.csproj",
+  "projectFilePath": "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\AntInventarisApp\\InventarisApp\\InventarisApp.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\azaha\\.nuget\\packages\\bcrypt.net-next\\4.1.0\\bcrypt.net-next.4.1.0.nupkg.sha512",
     "C:\\Users\\azaha\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\azaha\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",
     "C:\\Users\\azaha\\.nuget\\packages\\microsoft.build.framework\\17.8.3\\microsoft.build.framework.17.8.3.nupkg.sha512",

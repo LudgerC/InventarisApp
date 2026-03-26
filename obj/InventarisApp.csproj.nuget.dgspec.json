@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\InventApp\\InventarisApp.csproj": {}
+    "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\AntInventarisApp\\InventarisApp\\InventarisApp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\InventApp\\InventarisApp.csproj": {
+    "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\AntInventarisApp\\InventarisApp\\InventarisApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\InventApp\\InventarisApp.csproj",
+        "projectUniqueName": "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\AntInventarisApp\\InventarisApp\\InventarisApp.csproj",
         "projectName": "InventarisApp",
-        "projectPath": "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\InventApp\\InventarisApp.csproj",
+        "projectPath": "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\AntInventarisApp\\InventarisApp\\InventarisApp.csproj",
         "packagesPath": "C:\\Users\\azaha\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\InventApp\\obj\\",
+        "outputPath": "C:\\Users\\azaha\\Documents\\School\\GradPROG\\2de_Jaar\\stage\\2.tijdens\\AntInventarisApp\\InventarisApp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -51,6 +51,10 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",

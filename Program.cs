@@ -20,6 +20,13 @@ var localizationOptions = new RequestLocalizationOptions
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+    });
+
 builder.Services.AddDbContext<InventarisContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("LocalConnection");
@@ -42,6 +49,7 @@ app.UseHttpsRedirection();
 app.UseRequestLocalization(localizationOptions);
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
