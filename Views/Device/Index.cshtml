@@ -68,11 +68,11 @@
                                 <a asp-action="Edit" asp-route-type="@item.type" asp-route-deviceId="@item.device_id" class="btn btn-sm btn-outline-secondary">
                                     <i class="bi bi-pencil"></i> Bewerken
                                 </a>
-                                <form asp-action="Delete" asp-route-type="@item.type" asp-route-deviceId="@item.device_id" method="post" class="d-inline" onsubmit="return confirm('Weet je zeker dat je dit apparaat wilt verwijderen?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i> Verwijderen
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-btn" 
+                                        data-action="@Url.Action("Delete", "Device", new { type = item.type, deviceId = item.device_id })"
+                                        data-message="Weet je zeker dat je dit apparaat (@item.merk @item.model) wilt verwijderen?">
+                                    <i class="bi bi-trash"></i> Verwijderen
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -88,3 +88,52 @@
         </table>
     </div>
 </div>
+@section Modals {
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4 text-center">
+                <i class="bi bi-exclamation-triangle-fill text-danger mb-3" style="font-size: 3rem;"></i>
+                <h5 class="fw-bold mb-3">Bevestig Verwijdering</h5>
+                <p id="deleteModalMessage" class="text-muted small">Weet je het zeker?</p>
+                
+                <form id="globalDeleteForm" method="post">
+                    @Html.AntiForgeryToken()
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0 justify-content-center">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuleren</button>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger px-4 shadow-sm">Verwijderen</button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const deleteModalEl = document.getElementById('deleteConfirmModal');
+            const deleteModal = new bootstrap.Modal(deleteModalEl);
+            const deleteForm = document.getElementById('globalDeleteForm');
+            const deleteMessage = document.getElementById('deleteModalMessage');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    const message = this.getAttribute('data-message');
+                    
+                    deleteForm.setAttribute('action', action);
+                    deleteMessage.textContent = message;
+                    deleteModal.show();
+                });
+            });
+
+            confirmBtn.addEventListener('click', function() {
+                deleteForm.submit();
+            });
+        });
+    </script>
+}

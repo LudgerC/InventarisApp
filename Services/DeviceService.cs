@@ -88,6 +88,7 @@ namespace InventarisApp.Services
 
             // Update allowed fields
             existingInfo.merk = info.merk;
+            existingInfo.apparaatnaam = info.apparaatnaam;
             existingInfo.model = info.model;
             existingInfo.ip = info.ip;
             existingInfo.status = info.status;

@@ -4,6 +4,7 @@ using InventarisApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace InventarisApp.Controllers
@@ -30,6 +31,7 @@ namespace InventarisApp.Controllers
         {
             ViewBag.Locaties = await _context.Locaties.ToListAsync();
             ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
+            ViewBag.DeviceTypes = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
             return View();
         }
 
@@ -71,6 +73,7 @@ namespace InventarisApp.Controllers
             }
             ViewBag.Locaties = await _context.Locaties.ToListAsync();
             ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
+            ViewBag.DeviceTypes = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
             return View(info);
         }
 
@@ -89,6 +92,7 @@ namespace InventarisApp.Controllers
 
             ViewBag.Locaties = await _context.Locaties.ToListAsync();
             ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
+            ViewBag.DeviceTypes = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
             return View(info);
         }
 
@@ -123,6 +127,7 @@ namespace InventarisApp.Controllers
             }
             ViewBag.Locaties = await _context.Locaties.ToListAsync();
             ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
+            ViewBag.DeviceTypes = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
             return View(info);
         }
 

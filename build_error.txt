@@ -1,0 +1,31 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+C:\Users\ludge\source\repos\InventarisApp\Views\Device\Edit.cshtml(62,36): error RZ1031: The tag helper 'input' must not have C# in the element's attribute declaration area. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Services\DeviceService.cs(33,39): warning CS8602: Dereference of a possibly null reference. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Services\DeviceService.cs(43,39): warning CS8602: Dereference of a possibly null reference. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Services\DeviceService.cs(40,20): warning CS8603: Possible null reference return. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Wifi.cs(14,23): warning CS8618: Non-nullable property 'type' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Device.cs(13,23): warning CS8618: Non-nullable property 'type' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Info.cs(13,23): warning CS8618: Non-nullable property 'type' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Locatie.cs(13,23): warning CS8618: Non-nullable property 'naam' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Locatie.cs(16,23): warning CS8618: Non-nullable property 'abbreviation' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Lokaal.cs(14,23): warning CS8618: Non-nullable property 'lokaalnr' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+
+Build FAILED.
+
+C:\Users\ludge\source\repos\InventarisApp\Services\DeviceService.cs(33,39): warning CS8602: Dereference of a possibly null reference. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Services\DeviceService.cs(43,39): warning CS8602: Dereference of a possibly null reference. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Services\DeviceService.cs(40,20): warning CS8603: Possible null reference return. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Wifi.cs(14,23): warning CS8618: Non-nullable property 'type' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Device.cs(13,23): warning CS8618: Non-nullable property 'type' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Info.cs(13,23): warning CS8618: Non-nullable property 'type' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Locatie.cs(13,23): warning CS8618: Non-nullable property 'naam' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Locatie.cs(16,23): warning CS8618: Non-nullable property 'abbreviation' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Models\Lokaal.cs(14,23): warning CS8618: Non-nullable property 'lokaalnr' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+C:\Users\ludge\source\repos\InventarisApp\Views\Device\Edit.cshtml(62,36): error RZ1031: The tag helper 'input' must not have C# in the element's attribute declaration area. [C:\Users\ludge\source\repos\InventarisApp\InventarisApp.csproj]
+    9 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:02.22
+
+Workload updates are available. Run `dotnet workload list` for more information.

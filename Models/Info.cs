@@ -21,8 +21,12 @@ namespace InventarisApp.Models
         // Data properties
         [MaxLength(100)]
         public string? merk { get; set; }
+
+        [MaxLength(100)]
+        public string? apparaatnaam { get; set; }
         
         [MaxLength(50)]
+        [RegularExpression(@"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$", ErrorMessage = "Ongeldig IP-adres.")]
         public string? ip { get; set; }
         
         [MaxLength(100)]

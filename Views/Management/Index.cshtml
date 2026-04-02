@@ -1,0 +1,66 @@
+@{
+    ViewData["Title"] = "Beheer Dashboard";
+}
+
+<div class="row min-vh-100 justify-content-center bg-light pt-5">
+    <div class="col-md-10">
+        <div class="text-center mb-5">
+            <h1 class="fw-bold text-gradient display-4" style="font-family: 'Outfit', sans-serif;">Beheer Paneel</h1>
+            <p class="text-muted lead">Beheer locaties, lokalen en apparaatgegevens vanuit één centrale plek.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Campuses -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100 hover-shadow transition">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-building fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Campussen</h4>
+                        <p class="text-muted small mb-4">Beheer alle campussen en hun afkortingen in het systeem.</p>
+                        <a asp-action="Campuses" class="btn btn-primary w-100 rounded-pill">Beheren</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rooms -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100 hover-shadow transition">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-door-open fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Lokalen</h4>
+                        <p class="text-muted small mb-4">Voeg lokalen toe aan campussen en beheer hun capaciteit.</p>
+                        <a asp-action="Rooms" class="btn btn-success w-100 rounded-pill">Beheren</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Types -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100 hover-shadow transition">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info bg-opacity-10 text-info rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-laptop fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Apparaattypes</h4>
+                        <p class="text-muted small mb-4">Voeg nieuwe apparaattypes toe voor gebruik in formulieren.</p>
+                        <a asp-action="DeviceTypes" class="btn btn-info text-white w-100 rounded-pill">Beheren</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition { transition: all 0.3s ease-in-out; }
+    .hover-shadow:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.1) !important; }
+    .text-gradient {
+        background: linear-gradient(45deg, #6366f1, #a855f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+</style>

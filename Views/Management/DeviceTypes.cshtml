@@ -1,0 +1,115 @@
+@model List<string>
+@{
+    ViewData["Title"] = "Apparaattypes Beheren";
+}
+
+<div class="row min-vh-100 bg-light pt-4">
+    <div class="col-md-10 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold h2"><i class="bi bi-laptop me-2 text-info"></i>Apparaattypes</h1>
+            <button class="btn btn-info text-white shadow-sm rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addTypeModal">
+                <i class="bi bi-plus-lg me-2"></i>Nieuw Type
+            </button>
+        </div>
+
+        <div class="row g-3">
+            @foreach (var type in Model)
+            {
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 position-relative">
+                        <div class="card-body py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-tag-fill text-info me-3"></i>
+                            <span class="fw-bold">@type</span>
+                            
+                            <button type="button" class="btn btn-link text-danger p-0 border-0 delete-btn" 
+                                    data-action="@Url.Action("DeleteDeviceType", "Management", new { type = type })"
+                                    data-message="Weet je zeker dat je dit type wilt verwijderen? Dit kan alleen als er geen apparaten meer aan dit type zijn gekoppeld."
+                                    title="Verwijderen">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mt-5">
+            <a asp-action="Index" class="btn btn-link text-muted p-0"><i class="bi bi-arrow-left me-2"></i>Terug naar Dashboard</a>
+        </div>
+    </div>
+</div>
+
+@section Modals {
+    <!-- Add Type Modal -->
+    <div class="modal fade" id="addTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Nieuw Apparaattype Toevoegen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="CreateDeviceType" method="post">
+                    <div class="modal-body p-4">
+                        <p class="text-muted small mb-4">Nieuwe types zijn direct beschikbaar in de registratieformulieren.</p>
+                        <div class="form-floating mb-3">
+                            <input name="type" class="form-control" id="typeName" placeholder="Type" required />
+                            <label for="typeName">Type Naam (bijv. Monitor, Printer, Hub)</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="submit" class="btn btn-info text-white px-4 shadow-sm">Toevoegen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-body p-4 text-center">
+                    <i class="bi bi-exclamation-triangle-fill text-danger mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="fw-bold mb-3">Bevestig Verwijdering</h5>
+                    <p id="deleteModalMessage" class="text-muted small">Weet je het zeker?</p>
+                    
+                    <form id="globalDeleteForm" method="post">
+                        @Html.AntiForgeryToken()
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuleren</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger px-4 shadow-sm">Verwijderen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const deleteModalEl = document.getElementById('deleteConfirmModal');
+            const deleteModal = new bootstrap.Modal(deleteModalEl);
+            const deleteForm = document.getElementById('globalDeleteForm');
+            const deleteMessage = document.getElementById('deleteModalMessage');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    const message = this.getAttribute('data-message');
+                    
+                    deleteForm.setAttribute('action', action);
+                    deleteMessage.textContent = message;
+                    deleteModal.show();
+                });
+            });
+
+            confirmBtn.addEventListener('click', function() {
+                deleteForm.submit();
+            });
+        });
+    </script>
+}

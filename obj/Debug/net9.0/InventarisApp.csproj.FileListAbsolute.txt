@@ -109,7 +109,6 @@ C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\rjsmcshtml.dswa.cache
 C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\scopedcss\bundle\InventarisApp.styles.css
 C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\scopedcss\projectbundle\InventarisApp.bundle.scp.css
-C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\compressed\h6qrrt35tj-6i09r8iydy.gz
 C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\compressed\6xtf4g6luk-61n19gt1b8.gz
 C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\compressed\h9fcoagiry-xtxxf3hu2r.gz
 C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\compressed\hzmq89n9wl-t1cqhe9u97.gz
@@ -560,3 +559,4 @@ C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\AntInventarisA
 C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\AntInventarisApp\InventarisApp\obj\Debug\net9.0\InventarisApp.genruntimeconfig.cache
 C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\AntInventarisApp\InventarisApp\obj\Debug\net9.0\ref\InventarisApp.dll
 C:\Users\ludge\source\repos\InventarisApp\bin\Debug\net9.0\BCrypt.Net-Next.dll
+C:\Users\ludge\source\repos\InventarisApp\obj\Debug\net9.0\compressed\h6qrrt35tj-j8btzgbt8x.gz

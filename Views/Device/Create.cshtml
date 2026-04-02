@@ -1,5 +1,7 @@
 @model InventarisApp.Models.Info
 
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+
 @{
     ViewData["Title"] = "Add Device";
     var lokalen = ViewBag.Lokalen as List<InventarisApp.Models.Lokaal> ?? new List<InventarisApp.Models.Lokaal>();
@@ -19,9 +21,20 @@
                     <h5 class="text-primary border-bottom pb-2 mb-3">Basis Informatie</h5>
                     <div class="row g-3">
                         <div class="col-md-6 form-floating mb-3">
-                            <input asp-for="type" class="form-control" placeholder="Type" />
+                            <select asp-for="type" id="typeSelect" class="form-select" placeholder="Selecteer type...">
+                                <option value="">-- Selecteer Type --</option>
+                                @foreach (var type in ViewBag.DeviceTypes as List<string> ?? new List<string>())
+                                {
+                                    <option value="@type">@type</option>
+                                }
+                            </select>
                             <label asp-for="type" class="ms-2">Apparaat Type</label>
                             <span asp-validation-for="type" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="apparaatnaam" class="form-control" placeholder="Apparaatnaam" />
+                            <label asp-for="apparaatnaam" class="ms-2">Apparaatnaam (Optioneel)</label>
+                            <span asp-validation-for="apparaatnaam" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6 form-floating mb-3">
                             <input asp-for="merk" class="form-control" placeholder="Merk" />
@@ -38,8 +51,14 @@
                             <label asp-for="serial_number" class="ms-2">Serienummer</label>
                             <span asp-validation-for="serial_number" class="text-danger small"></span>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch pt-2">
+                                <input class="form-check-input" type="checkbox" id="hasIpCheckbox" onchange="toggleIpField()">
+                                <label class="form-check-label ms-2" for="hasIpCheckbox">Heeft IP-adres?</label>
+                            </div>
+                        </div>
                         <div class="col-md-6 form-floating mb-3">
-                            <input asp-for="ip" class="form-control" placeholder="IP-adres" />
+                            <input asp-for="ip" class="form-control" placeholder="IP-adres" id="ipField" disabled />
                             <label asp-for="ip" class="ms-2">IP-adres</label>
                             <span asp-validation-for="ip" class="text-danger small"></span>
                         </div>
@@ -55,27 +74,36 @@
                         </div>
                     </div>
 
-                    <h5 class="text-primary border-bottom pb-2 mt-4 mb-3">Locatie</h5>
-                    <div class="row g-3">
-                        <div class="col-md-6 form-floating mb-3">
-                            <select id="campusSelection" class="form-select" onchange="filterRooms()">
-                                <option value="">-- Selecteer Campus --</option>
-                                @foreach (var loc in locaties)
-                                {
-                                    <option value="@loc.locatie_id">@loc.naam</option>
-                                }
-                            </select>
-                            <label for="campusSelection" class="ms-2">Campus</label>
+                    <h5 class="text-primary border-bottom pb-2 mt-4 mb-3 d-flex align-items-center justify-content-between">
+                        <span>Locatie</span>
+                        <div class="form-check form-switch fs-6 mb-0">
+                            <input class="form-check-input" type="checkbox" id="hasLocationCheckbox" onchange="toggleLocationSection()">
+                            <label class="form-check-label fw-normal ms-1" for="hasLocationCheckbox">Locatie toewijzen?</label>
                         </div>
-                        <div class="col-md-6 form-floating mb-3">
-                            <select name="locationSelection" id="locationSelection" class="form-select" onchange="updateLocationValues()" disabled>
-                                <option value="">-- Selecteer eerst een Campus --</option>
-                            </select>
-                            <label for="locationSelection" class="ms-2">Lokaal</label>
-                            
-                            <input type="hidden" asp-for="locatie_id" id="hiddenLocatieId" />
-                            <input type="hidden" asp-for="lokaalnr" id="hiddenLokaalnr" />
-                            <span asp-validation-for="lokaalnr" class="text-danger small"></span>
+                    </h5>
+                    
+                    <div id="locationSectionContainer" style="display: none;">
+                        <div class="row g-3">
+                            <div class="col-md-6 form-floating mb-3">
+                                <select id="campusSelection" class="form-select" placeholder="Selecteer campus...">
+                                    <option value="">-- Selecteer Campus --</option>
+                                    @foreach (var loc in locaties)
+                                    {
+                                        <option value="@loc.locatie_id">@loc.naam</option>
+                                    }
+                                </select>
+                                <label for="campusSelection" class="ms-2">Campus</label>
+                            </div>
+                            <div class="col-md-6 form-floating mb-3">
+                                <select name="locationSelection" id="locationSelection" class="form-select" placeholder="Selecteer lokaal...">
+                                    <option value="">-- Selecteert eerst een Campus --</option>
+                                </select>
+                                <label for="locationSelection" class="ms-2">Lokaal</label>
+                                
+                                <input type="hidden" asp-for="locatie_id" id="hiddenLocatieId" />
+                                <input type="hidden" asp-for="lokaalnr" id="hiddenLokaalnr" />
+                                <span asp-validation-for="lokaalnr" class="text-danger small"></span>
+                            </div>
                         </div>
                     </div>
                     
@@ -134,32 +162,53 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
         var allRooms = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(lokalen.Select(l => new { l.locatie_id, l.lokaalnr })));
+        var campusTs, roomTs;
 
-        function filterRooms() {
-            var campusId = document.getElementById("campusSelection").value;
-            var roomSelect = document.getElementById("locationSelection");
+        function toggleLocationSection() {
+            var hasLocation = document.getElementById("hasLocationCheckbox").checked;
+            var container = document.getElementById("locationSectionContainer");
+            container.style.display = hasLocation ? "block" : "none";
             
-            roomSelect.innerHTML = '<option value="">-- Selecteer Lokaal --</option>';
+            if (!hasLocation) {
+                if (campusTs) campusTs.setValue("");
+                if (roomTs) {
+                    roomTs.clear();
+                    roomTs.clearOptions();
+                    roomTs.disable();
+                }
+                document.getElementById("hiddenLocatieId").value = "";
+                document.getElementById("hiddenLokaalnr").value = "";
+            } else {
+                if (campusTs) campusTs.focus();
+            }
+        }
+
+        function filterRooms(campusId) {
+            if (!roomTs) return;
+
+            roomTs.clear();
+            roomTs.clearOptions();
             
             if (campusId) {
                 var filtered = allRooms.filter(r => r.locatie_id == campusId);
-                filtered.forEach(function(r) {
-                    var opt = document.createElement("option");
-                    opt.value = r.locatie_id + "|" + r.lokaalnr;
-                    opt.text = r.lokaalnr;
-                    roomSelect.add(opt);
-                });
-                roomSelect.disabled = false;
+                var options = filtered.map(r => ({
+                    value: r.locatie_id + "|" + r.lokaalnr,
+                    text: r.lokaalnr
+                }));
+                roomTs.addOptions(options);
+                roomTs.enable();
             } else {
-                roomSelect.disabled = true;
+                roomTs.disable();
             }
             updateLocationValues();
         }
 
         function updateLocationValues() {
-            var selected = document.getElementById("locationSelection").value;
+            if (!roomTs) return;
+            var selected = roomTs.getValue();
             if (selected) {
                 var parts = selected.split('|');
                 document.getElementById("hiddenLocatieId").value = parts[0];
@@ -183,9 +232,39 @@
             });
         }
 
+        function toggleIpField() {
+            var hasIp = document.getElementById("hasIpCheckbox").checked;
+            var ipField = document.getElementById("ipField");
+            ipField.disabled = !hasIp;
+            if (!hasIp) {
+                ipField.value = "";
+            }
+        }
+
         // Initialize on page load
         document.addEventListener("DOMContentLoaded", function() {
             updateWarrantyFields();
+            toggleIpField();
+
+            new TomSelect('#typeSelect', {
+                create: false,
+                sortField: { field: 'text', order: 'asc' }
+            });
+
+            campusTs = new TomSelect('#campusSelection', {
+                create: false,
+                onChange: function(value) {
+                    filterRooms(value);
+                }
+            });
+
+            roomTs = new TomSelect('#locationSelection', {
+                create: false,
+                onChange: function(value) {
+                    updateLocationValues();
+                }
+            });
+            roomTs.disable();
         });
     </script>
 }
