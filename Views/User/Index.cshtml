@@ -9,6 +9,14 @@
     <a asp-action="Create" class="btn btn-primary"><i class="bi bi-person-plus"></i> Nieuwe Gebruiker</a>
 </div>
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -16,6 +24,68 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
+
+<!-- Filters en Sorteren -->
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-body bg-light rounded">
+        <form asp-action="Index" method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-bold"><i class="bi bi-search me-1"></i> Zoeken</label>
+                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Gebruikersnaam...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold"><i class="bi bi-person-badge me-1"></i> Rol</label>
+                <select name="roleFilter" class="form-select">
+                    <option value="">Alle rollen</option>
+                    @if (ViewBag.Roles != null)
+                    {
+                        foreach (string role in ViewBag.Roles)
+                        {
+                            if (ViewData["CurrentRole"]?.ToString() == role)
+                            {
+                                <option value="@role" selected="selected">@role</option>
+                            }
+                            else
+                            {
+                                <option value="@role">@role</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold"><i class="bi bi-activity me-1"></i> Status</label>
+                <select name="statusFilter" class="form-select">
+                    <option value="">Alle statussen</option>
+                    @if (ViewData["CurrentStatus"]?.ToString() == "Active") { <option value="Active" selected="selected">Actief</option> } else { <option value="Active">Actief</option> }
+                    @if (ViewData["CurrentStatus"]?.ToString() == "Inactive") { <option value="Inactive" selected="selected">Geblokkeerd</option> } else { <option value="Inactive">Geblokkeerd</option> }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold"><i class="bi bi-sort-alpha-down me-1"></i> Sorteren</label>
+                <select name="sortOrder" class="form-select">
+                    @{
+                        var currentSort = ViewData["CurrentSort"]?.ToString();
+                    }
+                    @if (string.IsNullOrEmpty(currentSort)) { <option value="" selected="selected">Gebruikersnaam (A-Z)</option> } else { <option value="">Gebruikersnaam (A-Z)</option> }
+                    @if (currentSort == "name_desc") { <option value="name_desc" selected="selected">Gebruikersnaam (Z-A)</option> } else { <option value="name_desc">Gebruikersnaam (Z-A)</option> }
+                    @if (currentSort == "role_asc") { <option value="role_asc" selected="selected">Rol (A-Z)</option> } else { <option value="role_asc">Rol (A-Z)</option> }
+                    @if (currentSort == "role_desc") { <option value="role_desc" selected="selected">Rol (Z-A)</option> } else { <option value="role_desc">Rol (Z-A)</option> }
+                    @if (currentSort == "status_asc") { <option value="status_asc" selected="selected">Status (Actief eerst)</option> } else { <option value="status_asc">Status (Actief eerst)</option> }
+                    @if (currentSort == "status_desc") { <option value="status_desc" selected="selected">Status (Geblokkeerd eerst)</option> } else { <option value="status_desc">Status (Geblokkeerd eerst)</option> }
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-filter"></i> Toepassen
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary" title="Filters wissen">
+                    <i class="bi bi-x-circle"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="card shadow-sm">
     <div class="card-body">
@@ -86,6 +156,11 @@
                                                 <i class="bi bi-person-up"></i> Maak Admin
                                             </button>
                                         }
+                                    </form>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline ms-1" onsubmit="return confirm('Weet je zeker dat je deze gebruiker wilt verwijderen? Dit kan niet ongedaan worden gemaakt.');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Verwijderen">
+                                            <i class="bi bi-trash"></i> Verwijderen
+                                        </button>
                                     </form>
                                 }
                             </td>

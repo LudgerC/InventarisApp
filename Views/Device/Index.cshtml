@@ -12,6 +12,95 @@
         </a>
     </div>
 
+    <!-- Filters en Sorteren -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body bg-light rounded">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold"><i class="bi bi-search me-1"></i> Zoeken</label>
+                    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Merk, model, serienummer...">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold"><i class="bi bi-pc-display me-1"></i> Type</label>
+                    <select name="typeFilter" class="form-select">
+                        <option value="">Alle types</option>
+                        @if (ViewBag.Types != null)
+                        {
+                            foreach (var type in ViewBag.Types)
+                            {
+                                if (ViewData["CurrentType"]?.ToString() == type)
+                                {
+                                    <option value="@type" selected="selected">@type</option>
+                                }
+                                else
+                                {
+                                    <option value="@type">@type</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold"><i class="bi bi-activity me-1"></i> Status</label>
+                    <select name="statusFilter" class="form-select">
+                        <option value="">Alle statussen</option>
+                        @if (ViewBag.Statuses != null)
+                        {
+                            foreach (string status in ViewBag.Statuses)
+                            {
+                                var statusLabel = status switch
+                                {
+                                    "Active" => "Actief",
+                                    "Inactive" => "Inactief",
+                                    "Maintenance" => "Onderhoud",
+                                    _ => status
+                                };
+                                if (ViewData["CurrentStatus"]?.ToString() == status)
+                                {
+                                    <option value="@status" selected="selected">@statusLabel</option>
+                                }
+                                else
+                                {
+                                    <option value="@status">@statusLabel</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold"><i class="bi bi-sort-alpha-down me-1"></i> Sorteren</label>
+                    <select name="sortOrder" class="form-select">
+                        @{
+                            var currentSort = ViewData["CurrentSort"]?.ToString();
+                        }
+                        @if (string.IsNullOrEmpty(currentSort))
+                        {
+                            <option value="" selected="selected">Type (A-Z)</option>
+                        }
+                        else
+                        {
+                            <option value="">Type (A-Z)</option>
+                        }
+
+                        @if (currentSort == "type_desc") { <option value="type_desc" selected="selected">Type (Z-A)</option> } else { <option value="type_desc">Type (Z-A)</option> }
+                        @if (currentSort == "merk") { <option value="merk" selected="selected">Merk (A-Z)</option> } else { <option value="merk">Merk (A-Z)</option> }
+                        @if (currentSort == "merk_desc") { <option value="merk_desc" selected="selected">Merk (Z-A)</option> } else { <option value="merk_desc">Merk (Z-A)</option> }
+                        @if (currentSort == "id") { <option value="id" selected="selected">ID (Oplopend)</option> } else { <option value="id">ID (Oplopend)</option> }
+                        @if (currentSort == "id_desc") { <option value="id_desc" selected="selected">ID (Aflopend)</option> } else { <option value="id_desc">ID (Aflopend)</option> }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-filter"></i> Toepassen
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary" title="Filters wissen">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="table-responsive shadow-sm rounded">
         <table class="table table-hover table-striped align-middle mb-0">
             <thead class="table-dark">
