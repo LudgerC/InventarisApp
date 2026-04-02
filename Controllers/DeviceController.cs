@@ -21,10 +21,53 @@ namespace InventarisApp.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string statusFilter, string typeFilter, string sortOrder)
         {
             var devices = await _deviceService.GetAllDevicesAsync();
-            return View(devices);
+            
+            IEnumerable<Info> filteredDevices = devices;
+
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentStatus"] = statusFilter;
+            ViewData["CurrentType"] = typeFilter;
+            ViewData["CurrentSort"] = sortOrder;
+
+            ViewBag.Types = devices.Select(d => d.type).Where(t => !string.IsNullOrEmpty(t)).Distinct().OrderBy(t => t).ToList();
+            ViewBag.Statuses = devices.Select(d => d.status).Where(s => !string.IsNullOrEmpty(s)).Distinct().OrderBy(s => s).ToList();
+
+            if (!string.IsNullOrEmpty(typeFilter))
+            {
+                filteredDevices = filteredDevices.Where(d => d.type == typeFilter);
+            }
+            
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                filteredDevices = filteredDevices.Where(d => d.status == statusFilter);
+            }
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.ToLower();
+                filteredDevices = filteredDevices.Where(d => 
+                    (d.merk != null && d.merk.ToLower().Contains(searchString)) ||
+                    (d.model != null && d.model.ToLower().Contains(searchString)) ||
+                    (d.serial_number != null && d.serial_number.ToLower().Contains(searchString)) ||
+                    (d.ip != null && d.ip.ToLower().Contains(searchString)) ||
+                    (d.device_id.ToString().Contains(searchString))
+                );
+            }
+
+            filteredDevices = sortOrder switch
+            {
+                "type_desc" => filteredDevices.OrderByDescending(d => d.type).ThenBy(d => d.device_id),
+                "id" => filteredDevices.OrderBy(d => d.device_id),
+                "id_desc" => filteredDevices.OrderByDescending(d => d.device_id),
+                "merk" => filteredDevices.OrderBy(d => d.merk).ThenBy(d => d.device_id),
+                "merk_desc" => filteredDevices.OrderByDescending(d => d.merk).ThenBy(d => d.device_id),
+                _ => filteredDevices.OrderBy(d => d.type).ThenBy(d => d.device_id)
+            };
+
+            return View(filteredDevices.ToList());
         }
 
         public async Task<IActionResult> Create()
