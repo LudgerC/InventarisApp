@@ -112,8 +112,7 @@
                     <th>Serienummer</th>
                     <th>IP-adres</th>
                     <th>Status</th>
-                    <th>Lokaal</th>
-                    <th>Locatie</th>
+                    <th>Aankoopdatum</th>
                     <th>Garantie Tot</th>
                     <th class="text-center">Acties</th>
                 </tr>
@@ -149,8 +148,7 @@
                                 @statusLabel
                             </span>
                         </td>
-                        <td>@(item.lokaalnr ?? "In Opslag")</td>
-                        <td>@(item.Lokaal?.Locatie?.naam ?? "N.v.t.")</td>
+                        <td>@(item.aankoopdatum?.ToString("dd/MM/yyyy") ?? "N.v.t.")</td>
                         <td>@(item.eind_garantie?.ToString("dd/MM/yyyy") ?? "N.v.t.")</td>
                         <td class="text-center">
                             <div class="btn-group">

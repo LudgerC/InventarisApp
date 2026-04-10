@@ -9,8 +9,6 @@ namespace InventarisApp.Database
         {
         }
 
-        public DbSet<Locatie> Locaties { get; set; }
-        public DbSet<Lokaal> Lokalen { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<Info> Infos { get; set; }
         public DbSet<Wifi> Wifis { get; set; }
@@ -19,10 +17,6 @@ namespace InventarisApp.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // Configure Lokaal composite key
-            modelBuilder.Entity<Lokaal>()
-                .HasKey(l => new { l.locatie_id, l.lokaalnr });
 
             // Configure Info composite key
             modelBuilder.Entity<Info>()
@@ -37,20 +31,6 @@ namespace InventarisApp.Database
                 .Property(i => i.eind_garantie)
                 .HasColumnName("eind garantie");
                 
-            // Define Locatie -> Lokaal relationship
-            modelBuilder.Entity<Lokaal>()
-                .HasOne(l => l.Locatie)
-                .WithMany(loc => loc.Lokalen)
-                .HasForeignKey(l => l.locatie_id)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Define Lokaal -> Info relationship
-            modelBuilder.Entity<Info>()
-                .HasOne(i => i.Lokaal)
-                .WithMany(l => l.Infos)
-                .HasForeignKey(i => new { i.locatie_id, i.lokaalnr })
-                .OnDelete(DeleteBehavior.Restrict);
-                
             // Define Info -> Device relationship (Although device_id is FK)
             modelBuilder.Entity<Info>()
                 .HasOne(i => i.Device)
@@ -64,17 +44,6 @@ namespace InventarisApp.Database
                 .WithMany(i => i.Wifis)
                 .HasForeignKey(w => new { w.type, w.device_id })
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // Seed Opslag data
-            modelBuilder.Entity<Locatie>().HasData(
-                new Locatie { locatie_id = 1, naam = "Campus Rouppe", abbreviation = "CR" },
-                new Locatie { locatie_id = 2, naam = "Campus Landsroem", abbreviation = "CL" }
-            );
-
-            modelBuilder.Entity<Lokaal>().HasData(
-                new Lokaal { locatie_id = 1, lokaalnr = "Opslag", plaatsen = 0 },
-                new Lokaal { locatie_id = 2, lokaalnr = "Opslag", plaatsen = 0 }
-            );
 
             // Seed Admin data
             modelBuilder.Entity<User>().HasData(

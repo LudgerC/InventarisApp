@@ -29,8 +29,6 @@ namespace InventarisApp.Services
         {
             return await _context.Infos
                 .Include(i => i.Device)
-                .Include(i => i.Lokaal)
-                    .ThenInclude(l => l.Locatie)
                 .Include(i => i.Wifis)
                 .ToListAsync();
         }
@@ -39,8 +37,6 @@ namespace InventarisApp.Services
         {
             return await _context.Infos
                 .Include(i => i.Device)
-                .Include(i => i.Lokaal)
-                    .ThenInclude(l => l.Locatie)
                 .Include(i => i.Wifis)
                 .FirstOrDefaultAsync(i => i.type == type && i.device_id == deviceId);
         }
@@ -49,10 +45,6 @@ namespace InventarisApp.Services
         {
             try
             {
-                // Ensure location IDs are null if empty strings were passed
-                if (string.IsNullOrEmpty(info.lokaalnr)) info.lokaalnr = null;
-                if (info.locatie_id == 0) info.locatie_id = null;
-
                 // Create a new Device record to get an automatically generated ID
                 var device = new Device { type = info.type ?? "Unknown" };
                 _context.Devices.Add(device);
@@ -94,8 +86,6 @@ namespace InventarisApp.Services
             existingInfo.status = info.status;
             existingInfo.serial_number = info.serial_number;
             existingInfo.leverancier = info.leverancier;
-            existingInfo.locatie_id = info.locatie_id;
-            existingInfo.lokaalnr = info.lokaalnr;
             existingInfo.garantie = info.garantie;
             existingInfo.aankoopdatum = info.aankoopdatum;
             existingInfo.eind_garantie = info.eind_garantie;

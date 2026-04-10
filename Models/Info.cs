@@ -14,10 +14,6 @@ namespace InventarisApp.Models
         
         public int device_id { get; set; }
         
-        // Foreign Key to Lokaal
-        public int? locatie_id { get; set; }
-        public string? lokaalnr { get; set; }
-        
         // Data properties
         [MaxLength(100)]
         public string? merk { get; set; }
@@ -54,9 +50,6 @@ namespace InventarisApp.Models
         // Navigation properties
         [ForeignKey("device_id")]
         public Device? Device { get; set; }
-        
-        [ForeignKey("locatie_id,lokaalnr")]
-        public Lokaal? Lokaal { get; set; }
         
         public ICollection<Wifi> Wifis { get; set; } = new List<Wifi>();
     }

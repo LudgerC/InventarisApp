@@ -72,8 +72,6 @@ namespace InventarisApp.Controllers
 
         public async Task<IActionResult> Create()
         {
-            ViewBag.Locaties = await _context.Locaties.ToListAsync();
-            ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
             ViewBag.DeviceTypes = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
             return View();
         }
@@ -84,9 +82,7 @@ namespace InventarisApp.Controllers
         {
             // Remove navigation properties from validation as they are handled server-side
             ModelState.Remove("Device");
-            ModelState.Remove("Lokaal");
             ModelState.Remove("info.Device");
-            ModelState.Remove("info.Lokaal");
             
             if (ModelState.IsValid)
             {
@@ -114,8 +110,6 @@ namespace InventarisApp.Controllers
                 var errors = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
                 TempData["Error"] = $"Validatie fout: {errors}";
             }
-            ViewBag.Locaties = await _context.Locaties.ToListAsync();
-            ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
             ViewBag.DeviceTypes = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
             return View(info);
         }
@@ -133,8 +127,6 @@ namespace InventarisApp.Controllers
                 return NotFound();
             }
 
-            ViewBag.Locaties = await _context.Locaties.ToListAsync();
-            ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
             ViewBag.DeviceTypes = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
             return View(info);
         }
@@ -149,9 +141,7 @@ namespace InventarisApp.Controllers
             }
 
             ModelState.Remove("Device");
-            ModelState.Remove("Lokaal");
             ModelState.Remove("info.Device");
-            ModelState.Remove("info.Lokaal");
 
             if (ModelState.IsValid)
             {
@@ -168,8 +158,6 @@ namespace InventarisApp.Controllers
                 var errors = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
                 TempData["Error"] = $"Validatie fout: {errors}";
             }
-            ViewBag.Locaties = await _context.Locaties.ToListAsync();
-            ViewBag.Lokalen = await _context.Lokalen.Include(l => l.Locatie).ToListAsync();
             ViewBag.DeviceTypes = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
             return View(info);
         }
