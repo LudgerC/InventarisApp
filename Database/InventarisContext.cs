@@ -13,6 +13,8 @@ namespace InventarisApp.Database
         public DbSet<Info> Infos { get; set; }
         public DbSet<Wifi> Wifis { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Persoon> Personen { get; set; }
+        public DbSet<Lening> Leningen { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
