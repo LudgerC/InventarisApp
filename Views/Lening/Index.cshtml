@@ -1,0 +1,149 @@
+@model IEnumerable<InventarisApp.Models.Lening>
+
+@{
+    ViewData["Title"] = "Uitleningen Overzicht";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-gradient" style="font-family: 'Outfit', sans-serif;">Beheer Leningen</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Nieuwe Lening Toevoegen
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Lening ID</th>
+                    <th>Persoon</th>
+                    <th>Apparaat</th>
+                    <th>Startdatum</th>
+                    <th>Einddatum</th>
+                    <th>Status</th>
+                    <th class="text-center">Acties</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    bool isAfgerond = item.einddatum.HasValue && item.einddatum.Value.Date <= DateTime.Now.Date;
+                    
+                    <tr>
+                        <td class="fw-bold">@item.ID</td>
+                        <td>
+                            @if(item.Persoon != null)
+                            {
+                                <span>@item.Persoon.Naam @item.Persoon.Achternaam</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Onbekend</span>
+                            }
+                        </td>
+                        <td>
+                            @if(item.Device != null)
+                            {
+                                var infoType = item.Device.type;
+                                var infoName = item.Device.Infos?.FirstOrDefault()?.apparaatnaam ?? (item.Device.Infos?.FirstOrDefault()?.merk + " " + item.Device.Infos?.FirstOrDefault()?.model);
+                                <span>[@infoType] @infoName</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Onbekend</span>
+                            }
+                        </td>
+                        <td>@item.startdatum.ToString("dd/MM/yyyy")</td>
+                        <td>@(item.einddatum?.ToString("dd/MM/yyyy") ?? "NVT")</td>
+                        <td>
+                            @if(isAfgerond)
+                            {
+                                <span class="badge bg-secondary text-white">Afgerond</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success text-white">Actief</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a asp-action="Details" asp-route-id="@item.ID" class="btn btn-sm btn-outline-info" title="Details zien">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-secondary" title="Aanpassen">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                @if(!isAfgerond)
+                                {
+                                    <form asp-action="Retourneer" asp-route-id="@item.ID" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Retourneren (Stop lenen)" onclick="return confirm('Weet u zeker dat dit apparaat geretourneerd is?');">
+                                            <i class="bi bi-arrow-return-left"></i>
+                                        </button>
+                                    </form>
+                                }
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-btn" 
+                                        data-action="@Url.Action("Delete", "Lening", new { id = item.ID })"
+                                        title="Verwijderen">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                
+                @if(!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 bg-light text-muted">Geen leningen geregistreerd in het systeem.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Modals {
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4 text-center">
+                <i class="bi bi-exclamation-triangle-fill text-danger mb-3" style="font-size: 3rem;"></i>
+                <h5 class="fw-bold mb-3">Bevestig Verwijdering</h5>
+                <p class="text-muted small">Weet je zeker dat je deze lening volledig & permanent uit de database wilt verwijderen?</p>
+                
+                <form id="globalDeleteForm" method="post">
+                    @Html.AntiForgeryToken()
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0 justify-content-center">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuleren</button>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger px-4 shadow-sm">Verwijderen</button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const deleteModalEl = document.getElementById('deleteConfirmModal');
+            const deleteModal = new bootstrap.Modal(deleteModalEl);
+            const deleteForm = document.getElementById('globalDeleteForm');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    deleteForm.setAttribute('action', action);
+                    deleteModal.show();
+                });
+            });
+
+            confirmBtn.addEventListener('click', function() {
+                deleteForm.submit();
+            });
+        });
+    </script>
+}

@@ -36,6 +36,7 @@ builder.Services.AddDbContext<InventarisContext>(options =>
 });
 
 builder.Services.AddScoped<IDeviceService, DeviceService>();
+builder.Services.AddScoped<ILeningService, LeningService>();
 
 var app = builder.Build();
 
