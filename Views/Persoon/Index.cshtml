@@ -1,18 +1,18 @@
-@model IEnumerable<InventarisApp.Models.Lening>
+@model IEnumerable<InventarisApp.Models.Persoon>
 
 @{
-    ViewData["Title"] = "Uitleningen Overzicht";
+    ViewData["Title"] = "Personen Overzicht";
 }
 
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-gradient" style="font-family: 'Outfit', sans-serif;">Beheer Leningen</h2>
+        <h2 class="fw-bold text-gradient" style="font-family: 'Outfit', sans-serif;">Beheer Personen</h2>
         <div>
-            <a asp-controller="Persoon" asp-action="Index" class="btn btn-outline-secondary me-2 shadow-sm">
-                <i class="bi bi-people me-1"></i> Personen Beheren
+            <a asp-controller="Lening" asp-action="Index" class="btn btn-outline-secondary me-2 shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i> Terug naar Leningen
             </a>
             <a asp-action="Create" class="btn btn-primary shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> Nieuwe Lening Toevoegen
+                <i class="bi bi-person-plus me-1"></i> Nieuwe Persoon
             </a>
         </div>
     </div>
@@ -21,74 +21,49 @@
         <table class="table table-hover table-striped align-middle mb-0">
             <thead class="table-dark">
                 <tr>
-                    <th>Lening ID</th>
-                    <th>Persoon</th>
-                    <th>Apparaat</th>
-                    <th>Startdatum</th>
-                    <th>Einddatum</th>
-                    <th>Status</th>
+                    <th>ID</th>
+                    <th>Volledige Naam</th>
+                    <th>Functie</th>
+                    <th>Contact</th>
+                    <th>Actieve Leningen</th>
                     <th class="text-center">Acties</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
-                    bool isAfgerond = item.einddatum.HasValue && item.einddatum.Value.Date <= DateTime.Now.Date;
+                    var actieveLeningen = item.Leningen?.Count(l => !l.einddatum.HasValue || l.einddatum > DateTime.Now) ?? 0;
                     
                     <tr>
                         <td class="fw-bold">@item.ID</td>
                         <td>
-                            @if(item.Persoon != null)
-                            {
-                                <span>@item.Persoon.Naam @item.Persoon.Achternaam</span>
-                            }
-                            else
-                            {
-                                <span class="text-muted">Onbekend</span>
-                            }
+                            <strong class="d-block">@item.Naam @item.Achternaam</strong>
+                        </td>
+                        <td>@(string.IsNullOrEmpty(item.functie) ? "-" : item.functie)</td>
+                        <td>
+                            <div class="small">
+                                @if(!string.IsNullOrEmpty(item.emailadres)) { <div><i class="bi bi-envelope text-muted me-1"></i> @item.emailadres</div> }
+                                @if(!string.IsNullOrEmpty(item.tel)) { <div><i class="bi bi-telephone text-muted me-1"></i> @item.tel</div> }
+                                @if(string.IsNullOrEmpty(item.emailadres) && string.IsNullOrEmpty(item.tel)) { <span class="text-muted">Geen data</span> }
+                            </div>
                         </td>
                         <td>
-                            @if(item.Device != null)
+                            @if(actieveLeningen > 0)
                             {
-                                var infoType = item.Device.type;
-                                var infoName = item.Device.Infos?.FirstOrDefault()?.apparaatnaam ?? (item.Device.Infos?.FirstOrDefault()?.merk + " " + item.Device.Infos?.FirstOrDefault()?.model);
-                                <span>[@infoType] @infoName</span>
+                                <span class="badge bg-primary rounded-pill px-3">@actieveLeningen Apparaten</span>
                             }
                             else
                             {
-                                <span class="text-muted">Onbekend</span>
-                            }
-                        </td>
-                        <td>@item.startdatum.ToString("dd/MM/yyyy")</td>
-                        <td>@(item.einddatum?.ToString("dd/MM/yyyy") ?? "NVT")</td>
-                        <td>
-                            @if(isAfgerond)
-                            {
-                                <span class="badge bg-secondary text-white">Afgerond</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-success text-white">Actief</span>
+                                <span class="text-muted small">0 Apparaten</span>
                             }
                         </td>
                         <td class="text-center">
                             <div class="btn-group">
-                                <a asp-action="Details" asp-route-id="@item.ID" class="btn btn-sm btn-outline-info" title="Details zien">
-                                    <i class="bi bi-eye"></i>
+                                <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-secondary" title="Details & Bewerken">
+                                    <i class="bi bi-pencil"></i> Bekijk / Bewerk
                                 </a>
-                                <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-secondary" title="Aanpassen">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                @if(!isAfgerond)
-                                {
-                                    <form asp-action="Retourneer" asp-route-id="@item.ID" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Retourneren (Stop lenen)" onclick="return confirm('Weet u zeker dat dit apparaat geretourneerd is?');">
-                                            <i class="bi bi-arrow-return-left"></i>
-                                        </button>
-                                    </form>
-                                }
                                 <button type="button" class="btn btn-sm btn-outline-danger delete-btn" 
-                                        data-action="@Url.Action("Delete", "Lening", new { id = item.ID })"
+                                        data-action="@Url.Action("Delete", "Persoon", new { id = item.ID })"
                                         title="Verwijderen">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -100,7 +75,7 @@
                 @if(!Model.Any())
                 {
                     <tr>
-                        <td colspan="7" class="text-center py-5 bg-light text-muted">Geen leningen geregistreerd in het systeem.</td>
+                        <td colspan="6" class="text-center py-5 bg-light text-muted">Geen personen gevonden in de database.</td>
                     </tr>
                 }
             </tbody>
@@ -115,7 +90,7 @@
             <div class="modal-body p-4 text-center">
                 <i class="bi bi-exclamation-triangle-fill text-danger mb-3" style="font-size: 3rem;"></i>
                 <h5 class="fw-bold mb-3">Bevestig Verwijdering</h5>
-                <p class="text-muted small">Weet je zeker dat je deze lening volledig & permanent uit de database wilt verwijderen?</p>
+                <p class="text-muted small">Weet je zeker dat je deze persoon (én bijbehorende leningen/historie) volledig wilt verwijderen?</p>
                 
                 <form id="globalDeleteForm" method="post">
                     @Html.AntiForgeryToken()
