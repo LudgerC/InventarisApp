@@ -15,79 +15,109 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v9.0
 build_property.RootNamespace = InventarisApp
 build_property.RootNamespace = InventarisApp
-build_property.ProjectDir = C:\Users\ludge\source\repos\InventarisApp\
+build_property.ProjectDir = C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\ludge\source\repos\InventarisApp
+build_property.MSBuildProjectDirectory = C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Account/AccessDenied.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Account/AccessDenied.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxBY2Nlc3NEZW5pZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Account/Login.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Account/Profile.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Account/Profile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxQcm9maWxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Device/Create.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Device/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGV2aWNlXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Device/Edit.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Device/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGV2aWNlXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Device/Index.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Device/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGV2aWNlXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Home/Index.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Management/DeviceTypes.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Lening/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVuaW5nXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Lening/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVuaW5nXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Lening/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVuaW5nXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Lening/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVuaW5nXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Management/DeviceTypes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlbWVudFxEZXZpY2VUeXBlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Management/Index.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Management/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlbWVudFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Shared/Error.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Persoon/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGVyc29vblxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Persoon/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGVyc29vblxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Persoon/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGVyc29vblxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/User/Create.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/User/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/User/Index.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/User/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/_ViewImports.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/_ViewStart.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ludge/source/repos/InventarisApp/Views/Shared/_Layout.cshtml]
+[C:/Users/azaha/Documents/School/GradPROG/2de_Jaar/stage/2.tijdens/InventarisApp/InventarisApp/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-6akvjw5q1w

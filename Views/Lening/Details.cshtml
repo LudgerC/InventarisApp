@@ -1,0 +1,141 @@
+@model InventarisApp.Models.Lening
+
+@{
+    ViewData["Title"] = "Lening Details";
+    bool isAfgerond = Model.einddatum.HasValue && Model.einddatum.Value.Date <= DateTime.Now.Date;
+    var info = Model.Device?.Infos?.FirstOrDefault();
+}
+
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-gradient" style="font-family: 'Outfit', sans-serif;">
+                    <i class="bi bi-info-circle me-2"></i> Lening #@Model.ID Details
+                </h2>
+                <div>
+                    @if(!isAfgerond)
+                    {
+                        <form asp-action="Retourneer" asp-route-id="@Model.ID" method="post" class="d-inline me-2">
+                            <button type="submit" class="btn btn-warning shadow-sm" onclick="return confirm('Bevestig dat dit apparaat retour is.');">
+                                <i class="bi bi-arrow-return-left me-1"></i> Retourneren
+                            </button>
+                        </form>
+                    }
+                    <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-primary shadow-sm">
+                        <i class="bi bi-pencil me-1"></i> Bewerken
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 h-100 rounded-4">
+                        <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                            <h5 class="fw-bold"><i class="bi bi-person me-2 text-primary"></i>Persoon Informatie</h5>
+                        </div>
+                        <div class="card-body">
+                            @if(Model.Persoon != null)
+                            {
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item px-0 d-flex justify-content-between">
+                                        <span class="text-muted">Volledige Naam</span>
+                                        <strong>@Model.Persoon.Naam @Model.Persoon.Achternaam</strong>
+                                    </li>
+                                    <li class="list-group-item px-0 d-flex justify-content-between">
+                                        <span class="text-muted">Functie</span>
+                                        <strong>@(Model.Persoon.functie ?? "-")</strong>
+                                    </li>
+                                    <li class="list-group-item px-0 d-flex justify-content-between">
+                                        <span class="text-muted">E-mail</span>
+                                        <strong>
+                                            @if(!string.IsNullOrEmpty(Model.Persoon.emailadres)){ <a href="mailto:@Model.Persoon.emailadres">@Model.Persoon.emailadres</a> } else { <span>-</span> }
+                                        </strong>
+                                    </li>
+                                    <li class="list-group-item px-0 d-flex justify-content-between">
+                                        <span class="text-muted">Telefoon</span>
+                                        <strong>@(Model.Persoon.tel ?? "-")</strong>
+                                    </li>
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 h-100 rounded-4">
+                        <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                            <h5 class="fw-bold"><i class="bi bi-pc-display me-2 text-primary"></i>Apparaat Informatie</h5>
+                        </div>
+                        <div class="card-body">
+                            @if(Model.Device != null)
+                            {
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item px-0 d-flex justify-content-between">
+                                        <span class="text-muted">ID / Type</span>
+                                        <strong>#@Model.Device.device_id - @Model.Device.type</strong>
+                                    </li>
+                                    <li class="list-group-item px-0 d-flex justify-content-between">
+                                        <span class="text-muted">Apparaatnaam</span>
+                                        <strong>@(info?.apparaatnaam ?? "-")</strong>
+                                    </li>
+                                    <li class="list-group-item px-0 d-flex justify-content-between">
+                                        <span class="text-muted">Merk & Model</span>
+                                        <strong>@(info?.merk ?? "-") @(info?.model ?? "")</strong>
+                                    </li>
+                                    <li class="list-group-item px-0 d-flex justify-content-between">
+                                        <span class="text-muted">Serienummer</span>
+                                        <code>@(info?.serial_number ?? "-")</code>
+                                    </li>
+                                </ul>
+                                <div class="mt-3 text-end">
+                                    <a asp-controller="Device" asp-action="Edit" asp-route-type="@Model.Device.type" asp-route-deviceId="@Model.Device.device_id" class="btn btn-sm btn-outline-secondary">
+                                        Bekijk Apparaat <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm border-0 rounded-4 mt-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4"><i class="bi bi-calendar-range me-2 text-primary"></i>Lening Status & Datums</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-4 text-center border-end">
+                            <div class="text-muted small mb-1">Status</div>
+                            <div class="fs-5">
+                                @if(isAfgerond)
+                                {
+                                    <span class="badge bg-secondary px-3 py-2">Afgerond / Retour</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success px-3 py-2">Actief</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center border-end">
+                            <div class="text-muted small mb-1">Startdatum</div>
+                            <div class="fs-5 fw-bold">@Model.startdatum.ToString("dd MMMM yyyy")</div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="text-muted small mb-1">Einddatum</div>
+                            <div class="fs-5 fw-bold text-danger">@(Model.einddatum?.ToString("dd MMMM yyyy") ?? "Geen / Actief")</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a asp-action="Index" class="btn btn-light shadow-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Terug naar overzicht
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

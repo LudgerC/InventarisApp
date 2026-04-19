@@ -1,0 +1,96 @@
+@model InventarisApp.Models.Lening
+
+@{
+    ViewData["Title"] = "Nieuwe Lening";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <h3 class="fw-bold text-gradient" style="font-family: 'Outfit', sans-serif;">Nieuwe Lening Toevoegen</h3>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="persoonID" class="form-label fw-bold">Persoon koppelen</label>
+                            <select asp-for="persoonID" class="form-control select2-dropdown" asp-items="ViewBag.Personen">
+                                <option value="">-- Zoek & Selecteer een Persoon --</option>
+                            </select>
+                            <span asp-validation-for="persoonID" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="DeviceId" class="form-label fw-bold">Apparaat koppelen</label>
+                            <select asp-for="DeviceId" class="form-control select2-dropdown" asp-items="ViewBag.Devices">
+                                <option value="">-- Zoek & Selecteer een Apparaat --</option>
+                            </select>
+                            <span asp-validation-for="DeviceId" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="startdatum" class="form-label fw-bold">Startdatum lening</label>
+                            <input asp-for="startdatum" type="date" class="form-control bg-light" />
+                            <span asp-validation-for="startdatum" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="einddatum" class="form-label fw-bold">Verwachte Einddatum (Optioneel)</label>
+                            <input asp-for="einddatum" type="date" class="form-control" />
+                            <span asp-validation-for="einddatum" class="text-danger small"></span>
+                            <div class="form-text">Laat leeg als het onbekend is hoelang de lening duurt.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-4">
+                        <a asp-action="Index" class="btn btn-light px-4">Annuleren</a>
+                        <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                            <i class="bi bi-save me-1"></i> Lening Opslaan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('.select2-dropdown').select2({
+                placeholder: function(){
+                    $(this).data('placeholder');
+                },
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function () {
+                        return "Geen resultaten gevonden";
+                    }
+                }
+            });
+        });
+    </script>
+    
+    <style>
+        .select2-container .select2-selection--single {
+            height: calc(3.5rem + 2px);
+            padding: 0.75rem 0.5rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            background-color: #f8f9fa;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 1.5;
+            color: #212529;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: calc(3.5rem + 2px);
+        }
+    </style>
+}

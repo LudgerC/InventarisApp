@@ -1,0 +1,129 @@
+@model IEnumerable<InventarisApp.Models.Persoon>
+
+@{
+    ViewData["Title"] = "Personen Overzicht";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-gradient" style="font-family: 'Outfit', sans-serif;">Beheer Personen</h2>
+        <div>
+            <a asp-controller="Lening" asp-action="Index" class="btn btn-outline-secondary me-2 shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i> Terug naar Leningen
+            </a>
+            <a asp-action="Create" class="btn btn-primary shadow-sm">
+                <i class="bi bi-person-plus me-1"></i> Nieuwe Persoon
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Volledige Naam</th>
+                    <th>Functie</th>
+                    <th>Contact</th>
+                    <th>Actieve Leningen</th>
+                    <th class="text-center">Acties</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var actieveLeningen = item.Leningen?.Count(l => !l.einddatum.HasValue || l.einddatum > DateTime.Now) ?? 0;
+                    
+                    <tr>
+                        <td class="fw-bold">@item.ID</td>
+                        <td>
+                            <strong class="d-block">@item.Naam @item.Achternaam</strong>
+                        </td>
+                        <td>@(string.IsNullOrEmpty(item.functie) ? "-" : item.functie)</td>
+                        <td>
+                            <div class="small">
+                                @if(!string.IsNullOrEmpty(item.emailadres)) { <div><i class="bi bi-envelope text-muted me-1"></i> @item.emailadres</div> }
+                                @if(!string.IsNullOrEmpty(item.tel)) { <div><i class="bi bi-telephone text-muted me-1"></i> @item.tel</div> }
+                                @if(string.IsNullOrEmpty(item.emailadres) && string.IsNullOrEmpty(item.tel)) { <span class="text-muted">Geen data</span> }
+                            </div>
+                        </td>
+                        <td>
+                            @if(actieveLeningen > 0)
+                            {
+                                <span class="badge bg-primary rounded-pill px-3">@actieveLeningen Apparaten</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">0 Apparaten</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-secondary" title="Details & Bewerken">
+                                    <i class="bi bi-pencil"></i> Bekijk / Bewerk
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-btn" 
+                                        data-action="@Url.Action("Delete", "Persoon", new { id = item.ID })"
+                                        title="Verwijderen">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                
+                @if(!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5 bg-light text-muted">Geen personen gevonden in de database.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Modals {
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4 text-center">
+                <i class="bi bi-exclamation-triangle-fill text-danger mb-3" style="font-size: 3rem;"></i>
+                <h5 class="fw-bold mb-3">Bevestig Verwijdering</h5>
+                <p class="text-muted small">Weet je zeker dat je deze persoon (én bijbehorende leningen/historie) volledig wilt verwijderen?</p>
+                
+                <form id="globalDeleteForm" method="post">
+                    @Html.AntiForgeryToken()
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0 justify-content-center">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuleren</button>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger px-4 shadow-sm">Verwijderen</button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const deleteModalEl = document.getElementById('deleteConfirmModal');
+            const deleteModal = new bootstrap.Modal(deleteModalEl);
+            const deleteForm = document.getElementById('globalDeleteForm');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    deleteForm.setAttribute('action', action);
+                    deleteModal.show();
+                });
+            });
+
+            confirmBtn.addEventListener('click', function() {
+                deleteForm.submit();
+            });
+        });
+    </script>
+}
