@@ -1,0 +1,103 @@
+@model InventarisApp.Models.Lokaal
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
+@{
+    ViewData["Title"] = "Nieuw Lokaal";
+}
+
+<div class="row min-vh-100 bg-light pt-4">
+    <div class="col-md-6 mx-auto">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white p-4 border-0">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i>Nieuw Lokaal Toevoegen</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="form-floating mb-3">
+                        <input asp-for="Naam" class="form-control" id="naamInput" placeholder="Lokaalnaam" required />
+                        <label asp-for="Naam">Lokaalnaam (bijv. 101, Computerlab)</label>
+                        <span asp-validation-for="Naam" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="AantalPlaatsen" class="form-control" id="plaatsenInput" placeholder="Aantal plaatsen" type="number" />
+                                <label asp-for="AantalPlaatsen">Aantal plaatsen</label>
+                                <span asp-validation-for="AantalPlaatsen" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="form-check form-switch ms-2">
+                                <input class="form-check-input" type="checkbox" asp-for="IsExtern" id="externSwitch">
+                                <label class="form-check-label fw-bold ms-2" for="externSwitch">Extern lokaal</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3" id="campusGroup">
+                        <label asp-for="LocatieId" class="form-label fw-bold small text-uppercase text-muted">Campus</label>
+                        <select asp-for="LocatieId" class="form-select rounded-3 shadow-none border-1" id="locatieSelect">
+                            <option value="">-- Selecteer Campus --</option>
+                            @foreach (var loc in ViewBag.Locaties)
+                            {
+                                <option value="@loc.ID">@loc.Naam</option>
+                            }
+                        </select>
+                        <span asp-validation-for="LocatieId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <textarea asp-for="Beschrijving" class="form-control" id="descInput" placeholder="Beschrijving" style="height: 100px"></textarea>
+                        <label asp-for="Beschrijving">Beschrijving (optioneel)</label>
+                        <span asp-validation-for="Beschrijving" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill shadow-sm">Opslaan</button>
+                        <a asp-action="Index" class="btn btn-light px-4 rounded-pill">Annuleren</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const externSwitch = document.getElementById('externSwitch');
+            const campusGroup = document.getElementById('campusGroup');
+            const locatieSelect = document.getElementById('locatieSelect');
+
+            // Initialize Choices.js
+            const choices = new Choices(locatieSelect, {
+                searchEnabled: true,
+                itemSelectText: '',
+                noResultsText: 'Geen resultaten gevonden',
+                noChoicesText: 'Geen opties beschikbaar',
+                placeholder: true,
+                placeholderValue: '-- Selecteer Campus --'
+            });
+
+            function toggleCampus() {
+                if (externSwitch.checked) {
+                    campusGroup.style.opacity = '0.5';
+                    choices.disable();
+                    choices.setChoiceByValue("");
+                } else {
+                    campusGroup.style.opacity = '1';
+                    choices.enable();
+                }
+            }
+
+            externSwitch.addEventListener('change', toggleCampus);
+            toggleCampus(); // Initial state
+        });
+    </script>
+}

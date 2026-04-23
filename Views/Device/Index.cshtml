@@ -7,9 +7,17 @@
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-gradient" style="font-family: 'Outfit', sans-serif;">Apparaten Inventaris</h2>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-1"></i> Nieuw Apparaat Toevoegen
-        </a>
+        <div class="d-flex gap-2">
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="DeviceTypes" class="btn btn-outline-info shadow-sm">
+                    <i class="bi bi-gear me-1"></i> Apparaattypes Beheren
+                </a>
+            }
+            <a asp-action="Create" class="btn btn-primary shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Nieuw Apparaat Toevoegen
+            </a>
+        </div>
     </div>
 
     <!-- Filters en Sorteren -->
@@ -108,7 +116,7 @@
                     <th>Type</th>
                     <th>ID</th>
                     <th>Merk</th>
-                    <th>Model</th>
+                    <th>Naam</th>
                     <th>Serienummer</th>
                     <th>IP-adres</th>
                     <th>Status</th>
@@ -124,7 +132,7 @@
                         <td class="fw-bold">@item.type</td>
                         <td>@item.device_id</td>
                         <td>@item.merk</td>
-                        <td>@item.model</td>
+                        <td class="fw-medium text-primary">@(string.IsNullOrEmpty(item.apparaatnaam) ? "-" : item.apparaatnaam)</td>
                         <td>@item.serial_number</td>
                         <td><code>@item.ip</code></td>
                         <td>
@@ -157,7 +165,7 @@
                                 </a>
                                 <button type="button" class="btn btn-sm btn-outline-danger delete-btn" 
                                         data-action="@Url.Action("Delete", "Device", new { type = item.type, deviceId = item.device_id })"
-                                        data-message="Weet je zeker dat je dit apparaat (@item.merk @item.model) wilt verwijderen?">
+                                        data-message="Weet je zeker dat je dit apparaat (@(item.apparaatnaam ?? item.merk)) wilt verwijderen?">
                                     <i class="bi bi-trash"></i> Verwijderen
                                 </button>
                             </div>

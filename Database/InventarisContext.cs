@@ -15,6 +15,10 @@ namespace InventarisApp.Database
         public DbSet<User> Users { get; set; }
         public DbSet<Persoon> Personen { get; set; }
         public DbSet<Lening> Leningen { get; set; }
+        public DbSet<Locatie> Locaties { get; set; }
+        public DbSet<Lokaal> Lokalen { get; set; }
+        public DbSet<MateriaalType> MateriaalTypes { get; set; }
+        public DbSet<Materiaal> Materialen { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,6 +50,13 @@ namespace InventarisApp.Database
                 .WithMany(i => i.Wifis)
                 .HasForeignKey(w => new { w.type, w.device_id })
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Define Info -> Lokaal relationship
+            modelBuilder.Entity<Info>()
+                .HasOne(i => i.Lokaal)
+                .WithMany(l => l.Devices)
+                .HasForeignKey(i => i.LokaalId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Seed Admin data
             modelBuilder.Entity<User>().HasData(

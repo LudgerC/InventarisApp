@@ -169,5 +169,116 @@ namespace InventarisApp.Controllers
             bool result = await _deviceService.DeleteDeviceAsync(type, deviceId);
             return RedirectToAction(nameof(Index));
         }
+
+        #region Device Type Management
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeviceTypes()
+        {
+            var types = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
+            return View(types);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateDeviceType(string type)
+        {
+            if (!string.IsNullOrWhiteSpace(type))
+            {
+                if (!await _context.Devices.AnyAsync(d => d.type == type))
+                {
+                    _context.Devices.Add(new Device { type = type });
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Apparaattype toegevoegd!";
+                }
+                else
+                {
+                    TempData["Error"] = "Dit type bestaat al.";
+                }
+            }
+            return RedirectToAction(nameof(DeviceTypes));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateDeviceType(string oldType, string newType)
+        {
+            if (string.IsNullOrWhiteSpace(oldType) || string.IsNullOrWhiteSpace(newType))
+            {
+                TempData["Error"] = "Ongeldige naam.";
+                return RedirectToAction(nameof(DeviceTypes));
+            }
+
+            if (oldType == newType) return RedirectToAction(nameof(DeviceTypes));
+
+            if (await _context.Devices.AnyAsync(d => d.type == newType && d.type != oldType))
+            {
+                TempData["Error"] = "Dit type bestaat al.";
+                return RedirectToAction(nameof(DeviceTypes));
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // We need to update all tables that use 'type'
+                // Since 'type' is part of PK in Infos and FK in Wifis, 
+                // we use raw SQL to handle these updates atomically.
+                
+                // 1. Update Wifis (FK to Infos)
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"UPDATE Wifis SET type = {newType} WHERE type = {oldType}");
+
+                // 2. Update Infos (PK)
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"UPDATE Infos SET type = {newType} WHERE type = {oldType}");
+
+                // 3. Update Devices
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"UPDATE Devices SET type = {newType} WHERE type = {oldType}");
+
+                await transaction.CommitAsync();
+                TempData["Success"] = $"Type succesvol gewijzigd van '{oldType}' naar '{newType}'.";
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["Error"] = "Er is een fout opgetreden bij het bijwerken van het type.";
+            }
+
+            return RedirectToAction(nameof(DeviceTypes));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteDeviceType(string type)
+        {
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                TempData["Error"] = "Ongeldig type.";
+                return RedirectToAction(nameof(DeviceTypes));
+            }
+
+            // 1. Check if ANY devices (Info) are still using this type
+            var deviceCount = await _context.Infos.CountAsync(i => i.type == type);
+            if (deviceCount > 0)
+            {
+                TempData["Error"] = $"Je kunt dit type '{type}' niet verwijderen omdat het nog gekoppeld is aan {deviceCount} apparaat/apparaten.";
+                return RedirectToAction(nameof(DeviceTypes));
+            }
+
+            // 2. If not in use, find and delete the type record
+            var typeToDelete = await _context.Devices.FirstOrDefaultAsync(d => d.type == type);
+            if (typeToDelete != null)
+            {
+                _context.Devices.Remove(typeToDelete);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"Apparaattype '{type}' succesvol verwijderd.";
+            }
+
+            return RedirectToAction(nameof(DeviceTypes));
+        }
+        #endregion
     }
 }

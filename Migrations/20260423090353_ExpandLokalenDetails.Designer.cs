@@ -4,6 +4,7 @@ using InventarisApp.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventarisApp.Migrations
 {
     [DbContext(typeof(InventarisContext))]
-    partial class InventarisContextModelSnapshot : ModelSnapshot
+    [Migration("20260423090353_ExpandLokalenDetails")]
+    partial class ExpandLokalenDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,10 +139,6 @@ namespace InventarisApp.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("Afkorting")
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
 
                     b.Property<string>("Naam")
                         .IsRequired()

@@ -1,0 +1,226 @@
+@model InventarisApp.Models.Lokaal
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
+@{
+    ViewData["Title"] = "Lokaal Details";
+}
+
+<div class="row min-vh-100 bg-light pt-4 pb-5">
+    <div class="col-md-10 mx-auto">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Lokalen</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">@Model.Naam</li>
+                    </ol>
+                </nav>
+                <h1 class="fw-bold h2 mb-0">@Model.Naam</h1>
+                @if (!string.IsNullOrEmpty(Model.Beschrijving))
+                {
+                    <p class="text-muted mb-0">@Model.Beschrijving</p>
+                }
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-outline-primary rounded-pill px-3 shadow-sm">
+                    <i class="bi bi-pencil me-2"></i>Bewerken
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Materialen Sectie -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-box-seam me-2 text-primary"></i>Materialen</h5>
+                        <button class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addMaterialModal">
+                            <i class="bi bi-plus-lg me-2"></i>Voeg Toe
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">Naam</th>
+                                        <th class="text-center">Aantal</th>
+                                        <th class="text-end pe-4">Acties</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var m in Model.Materialen)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 fw-medium">@(m.MateriaalType?.Naam ?? "Onbekend")</td>
+                                            <td class="text-center"><span class="badge bg-light text-dark rounded-pill border">@m.Aantal</span></td>
+                                            <td class="text-end pe-4">
+                                                <form asp-action="RemoveMaterial" asp-route-id="@m.ID" method="post" onsubmit="return confirm('Verwijder dit materiaal?');">
+                                                    <button type="submit" class="btn btn-link text-danger p-0"><i class="bi bi-trash"></i></button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (!Model.Materialen.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="3" class="text-center py-4 text-muted small">Geen materialen toegewezen.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apparaten Sectie -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-laptop me-2 text-primary"></i>Toegewezen Apparaten</h5>
+                        <button class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#assignDeviceModal">
+                            <i class="bi bi-plus-lg me-2"></i>Wijs Apparaat Toe
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">Apparaat</th>
+                                        <th class="text-end pe-4">Acties</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var d in Model.Devices)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="fw-medium">@d.apparaatnaam</div>
+                                                <div class="text-muted small">@d.type - @d.merk @d.model (@d.serial_number)</div>
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <form asp-action="UnassignDevice" method="post">
+                                                    <input type="hidden" name="lokaalId" value="@Model.ID" />
+                                                    <input type="hidden" name="type" value="@d.type" />
+                                                    <input type="hidden" name="deviceId" value="@d.device_id" />
+                                                    <button type="submit" class="btn btn-link text-danger p-0" title="Verwijder uit lokaal"><i class="bi bi-x-circle-fill"></i></button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (!Model.Devices.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="2" class="text-center py-4 text-muted small">Geen apparaten toegewezen.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Modals {
+    <!-- Modal: Materiaal Toevoegen -->
+    <div class="modal fade" id="addMaterialModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Materiaal Toevoegen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="AddMaterial" method="post">
+                    <input type="hidden" name="lokaalId" value="@Model.ID" />
+                    <div class="modal-body p-4">
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold small text-uppercase text-muted">Type Materiaal</label>
+                            <select name="materiaalTypeId" id="materiaalSelect" class="form-select rounded-3 shadow-none border-1" required>
+                                <option value="">-- Selecteer type --</option>
+                                @foreach (var type in ViewBag.MaterialTypes)
+                                {
+                                    <option value="@type.ID">@type.Naam</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-floating">
+                            <input type="number" name="aantal" class="form-control" id="matAantal" value="1" min="1" required />
+                            <label for="matAantal">Aantal</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill shadow-sm">Toevoegen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Apparaat Toewijzen -->
+    <div class="modal fade" id="assignDeviceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Apparaat Toewijzen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="AssignDevice" method="post">
+                    <input type="hidden" name="lokaalId" value="@Model.ID" />
+                    <div class="modal-body p-4">
+                        <p class="text-muted small mb-4">Kies uit beschikbare apparaten die nog niet in een lokaal staan.</p>
+                        <div class="form-group">
+                            <label class="form-label fw-bold small text-uppercase text-muted">Beschikbare Apparaten</label>
+                            <select name="deviceKey" id="deviceSelect" class="form-select rounded-3 shadow-none border-1" required>
+                                <option value="">-- Selecteer een apparaat --</option>
+                                @foreach (var device in ViewBag.AvailableDevices)
+                                {
+                                    <option value="@device.Key">@device.Value</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill shadow-sm">Toewijzen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const matSelect = document.getElementById('materiaalSelect');
+            const devSelect = document.getElementById('deviceSelect');
+
+            if (matSelect) {
+                new Choices(matSelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: '-- Selecteer type --'
+                });
+            }
+
+            if (devSelect) {
+                new Choices(devSelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: '-- Selecteer een apparaat --'
+                });
+            }
+        });
+    </script>
+}

@@ -21,12 +21,19 @@
                             <i class="bi bi-tag-fill text-info me-3"></i>
                             <span class="fw-bold">@type</span>
                             
-                            <button type="button" class="btn btn-link text-danger p-0 border-0 delete-btn" 
-                                    data-action="@Url.Action("DeleteDeviceType", "Management", new { type = type })"
-                                    data-message="Weet je zeker dat je dit type wilt verwijderen? Dit kan alleen als er geen apparaten meer aan dit type zijn gekoppeld."
-                                    title="Verwijderen">
-                                <i class="bi bi-x-circle"></i>
-                            </button>
+                            <div class="ms-auto d-flex gap-2">
+                                <button type="button" class="btn btn-link text-info p-0 border-0 edit-btn" 
+                                        data-type="@type"
+                                        title="Bewerken">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button type="button" class="btn btn-link text-danger p-0 border-0 delete-btn" 
+                                        data-action="@Url.Action("DeleteDeviceType", "Device", new { type = type })"
+                                        data-message="Weet je zeker dat je dit type wilt verwijderen? Dit kan alleen als er geen apparaten meer aan dit type zijn gekoppeld."
+                                        title="Verwijderen">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -34,7 +41,7 @@
         </div>
 
         <div class="mt-5">
-            <a asp-action="Index" class="btn btn-link text-muted p-0"><i class="bi bi-arrow-left me-2"></i>Terug naar Dashboard</a>
+            <a asp-controller="Device" asp-action="Index" class="btn btn-link text-muted p-0"><i class="bi bi-arrow-left me-2"></i>Terug naar Apparaten</a>
         </div>
     </div>
 </div>
@@ -48,7 +55,7 @@
                     <h5 class="modal-title fw-bold">Nieuw Apparaattype Toevoegen</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form asp-action="CreateDeviceType" method="post">
+                <form asp-controller="Device" asp-action="CreateDeviceType" method="post">
                     <div class="modal-body p-4">
                         <p class="text-muted small mb-4">Nieuwe types zijn direct beschikbaar in de registratieformulieren.</p>
                         <div class="form-floating mb-3">
@@ -59,6 +66,32 @@
                     <div class="modal-footer border-0 pt-0">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuleren</button>
                         <button type="submit" class="btn btn-info text-white px-4 shadow-sm">Toevoegen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Type Modal -->
+    <div class="modal fade" id="editTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Apparaattype Bewerken</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-controller="Device" asp-action="UpdateDeviceType" method="post">
+                    <div class="modal-body p-4">
+                        <p class="text-muted small mb-4">Let op: dit wijzigt de naam voor alle apparaten van dit type.</p>
+                        <input type="hidden" name="oldType" id="editOldType" />
+                        <div class="form-floating mb-3">
+                            <input name="newType" class="form-control" id="editTypeName" placeholder="Type" required />
+                            <label for="editTypeName">Nieuwe Type Naam</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="submit" class="btn btn-info text-white px-4 shadow-sm">Opslaan</button>
                     </div>
                 </form>
             </div>
@@ -90,6 +123,7 @@
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Delete logic
             const deleteModalEl = document.getElementById('deleteConfirmModal');
             const deleteModal = new bootstrap.Modal(deleteModalEl);
             const deleteForm = document.getElementById('globalDeleteForm');
@@ -109,6 +143,21 @@
 
             confirmBtn.addEventListener('click', function() {
                 deleteForm.submit();
+            });
+
+            // Edit logic
+            const editModalEl = document.getElementById('editTypeModal');
+            const editModal = new bootstrap.Modal(editModalEl);
+            const oldTypeInput = document.getElementById('editOldType');
+            const newTypeInput = document.getElementById('editTypeName');
+
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    oldTypeInput.value = type;
+                    newTypeInput.value = type;
+                    editModal.show();
+                });
             });
         });
     </script>

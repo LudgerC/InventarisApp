@@ -19,6 +19,36 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/InventarisApp.styles.css" asp-append-version="true" />
+    
+    <style>
+        /* Choices.js UI Fixes */
+        .choices__input {
+            width: 100% !important;
+            background-color: transparent !important;
+            font-size: 0.9rem !important;
+            padding: 4px 8px !important;
+        }
+        
+        .choices__inner {
+            min-height: 45px !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 0.5rem !important;
+            background-color: #fff !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .choices__list--dropdown .choices__input {
+            border: 1px solid #eee !important;
+            border-radius: 4px !important;
+            margin: 5px !important;
+            width: calc(100% - 10px) !important;
+        }
+
+        .choices__list--single {
+            padding: 0 16px 0 4px !important;
+        }
+    </style>
 </head>
 <body>
     <header class="shadow-sm">
@@ -45,6 +75,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Lokaal" ? "active" : "")"
+                                   asp-area="" asp-controller="Lokaal" asp-action="Index">
+                                    <i class="bi bi-door-open me-1"></i>Lokalen
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link @((string?)ViewData["Title"] == "Devices" ? "active" : "")"
                                    asp-area="" asp-controller="Device" asp-action="Index">
                                     <i class="bi bi-laptop me-1"></i>Apparaten
@@ -62,12 +98,6 @@
                                     <a class="nav-link @((string?)ViewData["Title"] == "Gebruikers Beheren" ? "active" : "")"
                                        asp-area="" asp-controller="User" asp-action="Index">
                                         <i class="bi bi-people me-1"></i>Gebruikers
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link @((string?)ViewData["Title"] == "Beheer" ? "active" : "")"
-                                       asp-area="" asp-controller="Management" asp-action="Index">
-                                        <i class="bi bi-gear me-1"></i>Beheer
                                     </a>
                                 </li>
                             }

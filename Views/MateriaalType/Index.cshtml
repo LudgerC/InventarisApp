@@ -1,0 +1,121 @@
+@model IEnumerable<InventarisApp.Models.MateriaalType>
+
+@{
+    ViewData["Title"] = "Materiaaltypes Beheren";
+}
+
+<div class="row min-vh-100 bg-light pt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold h2"><i class="bi bi-tags me-2 text-primary"></i>Materiaaltypes</h1>
+            <button class="btn btn-primary shadow-sm rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addTypeModal">
+                <i class="bi bi-plus-lg me-2"></i>Nieuw Type
+            </button>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Naam</th>
+                                <th class="text-end pe-4">Acties</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-medium">@item.Naam</td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button class="btn btn-link text-primary p-0" 
+                                                    onclick="editType(@item.ID, '@item.Naam')"
+                                                    data-bs-toggle="modal" data-bs-target="#editTypeModal">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <form asp-action="Delete" asp-route-id="@item.ID" method="post" onsubmit="return confirm('Weet je zeker dat je dit type wilt verwijderen?');">
+                                                <button type="submit" class="btn btn-link text-danger p-0"><i class="bi bi-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-center py-5 text-muted">Geen types gevonden.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a asp-controller="Lokaal" asp-action="Index" class="btn btn-link text-muted p-0"><i class="bi bi-arrow-left me-2"></i>Terug naar Lokalen</a>
+        </div>
+    </div>
+</div>
+
+@section Modals {
+    <!-- Modal: Type Toevoegen -->
+    <div class="modal fade" id="addTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Nieuw Materiaaltype</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="Create" method="post">
+                    <div class="modal-body p-4">
+                        <div class="form-floating mb-3">
+                            <input name="naam" class="form-control" id="typeName" placeholder="Naam" required />
+                            <label for="typeName">Naam (bijv. Stoel, Bureau)</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill shadow-sm">Toevoegen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Type Bewerken -->
+    <div class="modal fade" id="editTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Materiaaltype Bewerken</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" name="id" id="editTypeId" />
+                    <div class="modal-body p-4">
+                        <div class="form-floating mb-3">
+                            <input name="naam" class="form-control" id="editTypeName" placeholder="Naam" required />
+                            <label for="editTypeName">Naam</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill shadow-sm">Bijwerken</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function editType(id, naam) {
+            document.getElementById('editTypeId').value = id;
+            document.getElementById('editTypeName').value = naam;
+        }
+    </script>
+}

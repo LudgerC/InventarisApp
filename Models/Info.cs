@@ -51,6 +51,11 @@ namespace InventarisApp.Models
         [ForeignKey("device_id")]
         public Device? Device { get; set; }
         
+        public int? LokaalId { get; set; }
+        
+        [ForeignKey("LokaalId")]
+        public Lokaal? Lokaal { get; set; }
+
         public ICollection<Wifi> Wifis { get; set; } = new List<Wifi>();
     }
 }

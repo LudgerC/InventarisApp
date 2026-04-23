@@ -4,6 +4,7 @@ using InventarisApp.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventarisApp.Migrations
 {
     [DbContext(typeof(InventarisContext))]
-    partial class InventarisContextModelSnapshot : ModelSnapshot
+    [Migration("20260423090000_NormalizeMaterialTables")]
+    partial class NormalizeMaterialTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -129,28 +132,6 @@ namespace InventarisApp.Migrations
                     b.ToTable("Leningen");
                 });
 
-            modelBuilder.Entity("InventarisApp.Models.Locatie", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("Afkorting")
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<string>("Naam")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Locaties");
-                });
-
             modelBuilder.Entity("InventarisApp.Models.Lokaal", b =>
                 {
                     b.Property<int>("ID")
@@ -159,18 +140,9 @@ namespace InventarisApp.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<int>("AantalPlaatsen")
-                        .HasColumnType("int");
-
                     b.Property<string>("Beschrijving")
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
-
-                    b.Property<bool>("IsExtern")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int?>("LocatieId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Naam")
                         .IsRequired()
@@ -178,8 +150,6 @@ namespace InventarisApp.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("LocatieId");
 
                     b.ToTable("Lokalen");
                 });
@@ -370,15 +340,6 @@ namespace InventarisApp.Migrations
                     b.Navigation("Persoon");
                 });
 
-            modelBuilder.Entity("InventarisApp.Models.Lokaal", b =>
-                {
-                    b.HasOne("InventarisApp.Models.Locatie", "Locatie")
-                        .WithMany("Lokalen")
-                        .HasForeignKey("LocatieId");
-
-                    b.Navigation("Locatie");
-                });
-
             modelBuilder.Entity("InventarisApp.Models.Materiaal", b =>
                 {
                     b.HasOne("InventarisApp.Models.Lokaal", "Lokaal")
@@ -417,11 +378,6 @@ namespace InventarisApp.Migrations
             modelBuilder.Entity("InventarisApp.Models.Info", b =>
                 {
                     b.Navigation("Wifis");
-                });
-
-            modelBuilder.Entity("InventarisApp.Models.Locatie", b =>
-                {
-                    b.Navigation("Lokalen");
                 });
 
             modelBuilder.Entity("InventarisApp.Models.Lokaal", b =>
