@@ -64,8 +64,8 @@ namespace InventarisApp.Database
                 {
                     Id = 1,
                     Username = "admin",
-                    // Hashed "Admin123!" using BCrypt
-                    PasswordHash = "$2a$11$eNfFxyOQ/7o76hXwE/18/.M9v2vDkY6m8tP51BwEZyV44Qx74o77G",
+                    // Hashed "admin" using BCrypt
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin"),
                     Role = "Admin",
                     IsActive = true
                 }
