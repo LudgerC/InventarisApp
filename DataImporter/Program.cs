@@ -4,11 +4,16 @@ using ClosedXML.Excel;
 using InventarisApp.Database;
 using System.Text.Json;
 
-// Lees appsettings.json uit het hoofdproject
-var appSettingsPath = Path.Combine("..", "appsettings.json");
+// Probeer appsettings.json te vinden (ofwel in de huidige map, ofwel een map hoger)
+var appSettingsPath = "appsettings.json";
 if (!File.Exists(appSettingsPath))
 {
-    Console.WriteLine($"Kon appsettings.json niet vinden op: {appSettingsPath}");
+    appSettingsPath = Path.Combine("..", "appsettings.json");
+}
+
+if (!File.Exists(appSettingsPath))
+{
+    Console.WriteLine("Kon appsettings.json niet vinden in de huidige map of de bovenliggende map.");
     return;
 }
 
@@ -48,6 +53,11 @@ using var workbook = new XLWorkbook(path);
 await SeedLokalen(context, workbook);
 await SeedPersonen(context, workbook);
 await SeedTypes(context, workbook);
+await SeedDocentenPCs(context, workbook);
+await SeedStudentenPCs(context, workbook);
+await SeedAdministratiePCs(context, workbook);
+await SeedProjectie(context, workbook);
+await SeedNetwerk(context, workbook);
 
 Console.WriteLine("\nImport klaar!");
 
@@ -230,4 +240,206 @@ async Task SeedTypes(InventarisContext dbContext, XLWorkbook wb)
 
     await dbContext.SaveChangesAsync();
     Console.WriteLine("Types succesvol geïmporteerd!");
+}
+
+async Task<int?> GetLokaalId(InventarisContext dbContext, string lokaalNaam)
+{
+    if (string.IsNullOrWhiteSpace(lokaalNaam)) return null;
+    
+    // Normalize name (padding)
+    string searchName = lokaalNaam.Trim();
+    if (int.TryParse(searchName, out int numericName))
+    {
+        searchName = numericName.ToString("D3");
+    }
+    
+    var lokaal = await dbContext.Lokalen.FirstOrDefaultAsync(l => l.Naam == searchName);
+    return lokaal?.ID;
+}
+
+async Task<int?> GetPersoonId(InventarisContext dbContext, string voornaam)
+{
+    if (string.IsNullOrWhiteSpace(voornaam)) return null;
+    var persoon = await dbContext.Personen.FirstOrDefaultAsync(p => p.Naam.ToLower() == voornaam.Trim().ToLower());
+    return persoon?.ID;
+}
+
+async Task SeedDocentenPCs(InventarisContext dbContext, XLWorkbook wb)
+{
+    Console.WriteLine("Seeding Docenten PCs...");
+    var sheet = wb.Worksheet("Docenten_pcs");
+    var rows = sheet.RangeUsed().RowsUsed().Skip(1);
+
+    foreach (var row in rows)
+    {
+        var type = row.Cell(3).GetString().Trim();
+        if (string.IsNullOrEmpty(type)) continue;
+
+        var device = new InventarisApp.Models.Device { type = type };
+        dbContext.Devices.Add(device);
+        await dbContext.SaveChangesAsync();
+
+        var info = new InventarisApp.Models.Info
+        {
+            type = type,
+            device_id = device.device_id,
+            apparaatnaam = row.Cell(2).GetString().Trim(),
+            merk = row.Cell(4).GetString().Trim(),
+            serial_number = row.Cell(5).GetString().Trim(),
+            aantal = int.TryParse(row.Cell(6).GetString(), out int a) ? a : null,
+            LokaalId = await GetLokaalId(dbContext, row.Cell(8).GetString()),
+            status = row.Cell(9).GetString().Trim(),
+            staat = row.Cell(9).GetString().Trim(),
+            leverancier = row.Cell(10).GetString().Trim(),
+            aankoopdatum = row.Cell(11).TryGetValue(out DateTime d1) ? d1 : null,
+            eind_garantie = row.Cell(12).TryGetValue(out DateTime d2) ? d2 : null
+        };
+        dbContext.Infos.Add(info);
+    }
+    await dbContext.SaveChangesAsync();
+}
+
+async Task SeedStudentenPCs(InventarisContext dbContext, XLWorkbook wb)
+{
+    Console.WriteLine("Seeding Studenten PCs...");
+    var sheet = wb.Worksheet("Studenten_pcs");
+    var rows = sheet.RangeUsed().RowsUsed().Skip(1);
+
+    foreach (var row in rows)
+    {
+        var type = row.Cell(3).GetString().Trim();
+        if (string.IsNullOrEmpty(type)) continue;
+
+        var device = new InventarisApp.Models.Device { type = type };
+        dbContext.Devices.Add(device);
+        await dbContext.SaveChangesAsync();
+
+        var info = new InventarisApp.Models.Info
+        {
+            type = type,
+            device_id = device.device_id,
+            apparaatnaam = row.Cell(2).GetString().Trim(),
+            merk = row.Cell(4).GetString().Trim(),
+            serial_number = row.Cell(5).GetString().Trim(),
+            aantal = int.TryParse(row.Cell(6).GetString(), out int a) ? a : null,
+            LokaalId = await GetLokaalId(dbContext, row.Cell(8).GetString()),
+            status = row.Cell(9).GetString().Trim(),
+            staat = row.Cell(9).GetString().Trim(),
+            leverancier = row.Cell(10).GetString().Trim(),
+            aankoopdatum = row.Cell(11).TryGetValue(out DateTime d1) ? d1 : null,
+            eind_garantie = row.Cell(12).TryGetValue(out DateTime d2) ? d2 : null
+        };
+        dbContext.Infos.Add(info);
+    }
+    await dbContext.SaveChangesAsync();
+}
+
+async Task SeedAdministratiePCs(InventarisContext dbContext, XLWorkbook wb)
+{
+    Console.WriteLine("Seeding Administratie PCs...");
+    var sheet = wb.Worksheet("Administratie_pcs");
+    var rows = sheet.RangeUsed().RowsUsed().Skip(1);
+
+    foreach (var row in rows)
+    {
+        var type = row.Cell(3).GetString().Trim();
+        if (string.IsNullOrEmpty(type)) continue;
+
+        var device = new InventarisApp.Models.Device { type = type };
+        dbContext.Devices.Add(device);
+        await dbContext.SaveChangesAsync();
+
+        var verdiep = row.Cell(7).GetString().Trim().ToLower();
+        var lokaalOfPersoon = row.Cell(8).GetString().Trim();
+
+        var info = new InventarisApp.Models.Info
+        {
+            type = type,
+            device_id = device.device_id,
+            apparaatnaam = row.Cell(2).GetString().Trim(),
+            merk = row.Cell(4).GetString().Trim(),
+            serial_number = row.Cell(5).GetString().Trim(),
+            aantal = int.TryParse(row.Cell(6).GetString(), out int a) ? a : null,
+            status = row.Cell(9).GetString().Trim(),
+            staat = row.Cell(9).GetString().Trim(),
+            leverancier = row.Cell(10).GetString().Trim(),
+            aankoopdatum = row.Cell(11).TryGetValue(out DateTime d1) ? d1 : null,
+            eind_garantie = row.Cell(12).TryGetValue(out DateTime d2) ? d2 : null
+        };
+
+        if (verdiep == "persoon")
+        {
+            info.PersoonId = await GetPersoonId(dbContext, lokaalOfPersoon);
+        }
+        else
+        {
+            info.LokaalId = await GetLokaalId(dbContext, lokaalOfPersoon);
+        }
+
+        dbContext.Infos.Add(info);
+    }
+    await dbContext.SaveChangesAsync();
+}
+
+async Task SeedProjectie(InventarisContext dbContext, XLWorkbook wb)
+{
+    Console.WriteLine("Seeding Projectie...");
+    var sheet = wb.Worksheet("Projectie");
+    var rows = sheet.RangeUsed().RowsUsed().Skip(1);
+
+    foreach (var row in rows)
+    {
+        var type = row.Cell(3).GetString().Trim();
+        if (string.IsNullOrEmpty(type)) continue;
+
+        var device = new InventarisApp.Models.Device { type = type };
+        dbContext.Devices.Add(device);
+        await dbContext.SaveChangesAsync();
+
+        var info = new InventarisApp.Models.Info
+        {
+            type = type,
+            device_id = device.device_id,
+            apparaatnaam = row.Cell(2).GetString().Trim(),
+            merk = row.Cell(4).GetString().Trim(),
+            model = row.Cell(5).GetString().Trim(),
+            aantal = int.TryParse(row.Cell(6).GetString(), out int a) ? a : null,
+            LokaalId = await GetLokaalId(dbContext, row.Cell(8).GetString()),
+            staat = row.Cell(9).GetString().Trim(),
+            status = row.Cell(9).GetString().Trim(),
+            opmerkingen = row.Cell(10).GetString().Trim()
+        };
+        dbContext.Infos.Add(info);
+    }
+    await dbContext.SaveChangesAsync();
+}
+
+async Task SeedNetwerk(InventarisContext dbContext, XLWorkbook wb)
+{
+    Console.WriteLine("Seeding Netwerk...");
+    var sheet = wb.Worksheet("Netwerk");
+    var rows = sheet.RangeUsed().RowsUsed().Skip(1);
+
+    foreach (var row in rows)
+    {
+        var type = row.Cell(2).GetString().Trim();
+        if (string.IsNullOrEmpty(type)) continue;
+
+        var device = new InventarisApp.Models.Device { type = type };
+        dbContext.Devices.Add(device);
+        await dbContext.SaveChangesAsync();
+
+        var info = new InventarisApp.Models.Info
+        {
+            type = type,
+            device_id = device.device_id,
+            apparaatnaam = row.Cell(1).GetString().Trim(),
+            merk = row.Cell(3).GetString().Trim(),
+            serial_number = row.Cell(4).GetString().Trim(),
+            LokaalId = await GetLokaalId(dbContext, row.Cell(6).GetString()),
+            ip = row.Cell(7).GetString().Trim()
+        };
+        dbContext.Infos.Add(info);
+    }
+    await dbContext.SaveChangesAsync();
 }
