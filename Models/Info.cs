@@ -34,10 +34,16 @@ namespace InventarisApp.Models
         [MaxLength(50)]
         public string? status { get; set; }
         
-        public int? garantie { get; set; }
-        
         [MaxLength(100)]
         public string? leverancier { get; set; }
+        
+        public int? aantal { get; set; }
+        
+        [MaxLength(500)]
+        public string? opmerkingen { get; set; }
+        
+        [MaxLength(100)]
+        public string? staat { get; set; }
         
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
@@ -55,6 +61,11 @@ namespace InventarisApp.Models
         
         [ForeignKey("LokaalId")]
         public Lokaal? Lokaal { get; set; }
+
+        public int? PersoonId { get; set; }
+        
+        [ForeignKey("PersoonId")]
+        public Persoon? Persoon { get; set; }
 
         public ICollection<Wifi> Wifis { get; set; } = new List<Wifi>();
     }

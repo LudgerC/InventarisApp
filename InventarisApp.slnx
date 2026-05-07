@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="DataImporter/DataImporter.csproj" />
+  <Project Path="InventarisApp.csproj" />
+</Solution>
