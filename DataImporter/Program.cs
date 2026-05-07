@@ -90,7 +90,7 @@ async Task SeedLokalen(InventarisContext dbContext, XLWorkbook wb)
     await dbContext.SaveChangesAsync();
 
     var sheet = wb.Worksheet("Lokalen");
-    var rows = sheet.RangeUsed().RowsUsed().Skip(1); // Skip header
+    var rows = sheet.RangeUsed().RowsUsed().Skip(1); 
 
     // Find columns by header name
     var headerRow = sheet.Row(1);
@@ -103,6 +103,8 @@ async Task SeedLokalen(InventarisContext dbContext, XLWorkbook wb)
         else if (val == "isextern") isExternCol = cell.Address.ColumnNumber;
         else if (val == "beschrijving") beschrijvingCol = cell.Address.ColumnNumber;
     }
+
+    var addedLokalen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
     foreach (var row in rows)
     {
@@ -143,7 +145,9 @@ async Task SeedLokalen(InventarisContext dbContext, XLWorkbook wb)
             lokaalNaam = numericName.ToString("D3");
         }
 
-        // Check if exists
+        // Check if already processed in this loop or exists in DB
+        if (addedLokalen.Contains(lokaalNaam)) continue;
+
         var existing = await dbContext.Lokalen.FirstOrDefaultAsync(l => l.Naam == lokaalNaam);
         if (existing == null)
         {
@@ -156,6 +160,11 @@ async Task SeedLokalen(InventarisContext dbContext, XLWorkbook wb)
                 LocatieId = locatieId
             };
             dbContext.Lokalen.Add(lokaal);
+            addedLokalen.Add(lokaalNaam);
+        }
+        else
+        {
+            addedLokalen.Add(lokaalNaam);
         }
     }
 
@@ -242,26 +251,62 @@ async Task SeedTypes(InventarisContext dbContext, XLWorkbook wb)
     Console.WriteLine("Types succesvol geïmporteerd!");
 }
 
-async Task<int?> GetLokaalId(InventarisContext dbContext, string lokaalNaam)
+async Task<int?> GetLokaalId(InventarisContext dbContext, string? rawLokaal)
 {
-    if (string.IsNullOrWhiteSpace(lokaalNaam)) return null;
+    var lokaalNaam = CleanValue(rawLokaal);
+    if (lokaalNaam == null) return null;
     
-    // Normalize name (padding)
-    string searchName = lokaalNaam.Trim();
-    if (int.TryParse(searchName, out int numericName))
+    // Strip "R" if it's there (e.g. R102 -> 102)
+    if (lokaalNaam.StartsWith("R", StringComparison.OrdinalIgnoreCase) && lokaalNaam.Length > 1 && char.IsDigit(lokaalNaam[1]))
     {
-        searchName = numericName.ToString("D3");
+        lokaalNaam = lokaalNaam.Substring(1);
     }
     
-    var lokaal = await dbContext.Lokalen.FirstOrDefaultAsync(l => l.Naam == searchName);
+    // Pad to 3 digits if numeric (e.g. 9 -> 009)
+    if (int.TryParse(lokaalNaam, out int numericName))
+    {
+        lokaalNaam = numericName.ToString("D3");
+    }
+    
+    var lokaal = await dbContext.Lokalen.FirstOrDefaultAsync(l => l.Naam == lokaalNaam);
     return lokaal?.ID;
 }
 
-async Task<int?> GetPersoonId(InventarisContext dbContext, string voornaam)
+async Task<int?> GetPersoonId(InventarisContext dbContext, string? voornaam)
 {
-    if (string.IsNullOrWhiteSpace(voornaam)) return null;
-    var persoon = await dbContext.Personen.FirstOrDefaultAsync(p => p.Naam.ToLower() == voornaam.Trim().ToLower());
+    var name = CleanValue(voornaam);
+    if (name == null) return null;
+    var persoon = await dbContext.Personen.FirstOrDefaultAsync(p => p.Naam.ToLower() == name.ToLower());
     return persoon?.ID;
+}
+
+string? CleanValue(string? val)
+{
+    if (string.IsNullOrWhiteSpace(val)) return null;
+    val = val.Trim();
+    if (val.Equals("NVT", StringComparison.OrdinalIgnoreCase) || val.Equals("N.V.T.", StringComparison.OrdinalIgnoreCase)) return null;
+    return val;
+}
+
+DateTime? ParseExcelDate(IXLCell cell)
+{
+    if (cell.IsEmpty()) return null;
+    if (cell.TryGetValue(out DateTime d)) return d;
+    var s = CleanValue(cell.GetString());
+    if (s == null) return null;
+    if (DateTime.TryParse(s, out DateTime d2)) return d2;
+    return null;
+}
+
+int GetCol(IXLWorksheet sheet, string headerName)
+{
+    var firstRow = sheet.Row(1);
+    foreach (var cell in firstRow.CellsUsed())
+    {
+        if (cell.GetString().Trim().Replace(" ", "").ToLower() == headerName.Replace(" ", "").ToLower())
+            return cell.Address.ColumnNumber;
+    }
+    return 0;
 }
 
 async Task SeedDocentenPCs(InventarisContext dbContext, XLWorkbook wb)
@@ -270,9 +315,21 @@ async Task SeedDocentenPCs(InventarisContext dbContext, XLWorkbook wb)
     var sheet = wb.Worksheet("Docenten_pcs");
     var rows = sheet.RangeUsed().RowsUsed().Skip(1);
 
+    int naamIdx = GetCol(sheet, "Naam");
+    int typeIdx = GetCol(sheet, "Type");
+    int merkIdx = GetCol(sheet, "Merk");
+    int modelIdx = GetCol(sheet, "Model");
+    int snIdx = GetCol(sheet, "Serienummer");
+    int aantalIdx = GetCol(sheet, "Aantal");
+    int lokaalIdx = GetCol(sheet, "Lokaal");
+    int staatIdx = GetCol(sheet, "Staat");
+    int verkoperIdx = GetCol(sheet, "Verkoper");
+    int aankoopIdx = GetCol(sheet, "aankoopdatum");
+    int garantieIdx = GetCol(sheet, "einde garantie");
+
     foreach (var row in rows)
     {
-        var type = row.Cell(3).GetString().Trim();
+        var type = CleanValue(row.Cell(typeIdx).GetString());
         if (string.IsNullOrEmpty(type)) continue;
 
         var device = new InventarisApp.Models.Device { type = type };
@@ -283,16 +340,17 @@ async Task SeedDocentenPCs(InventarisContext dbContext, XLWorkbook wb)
         {
             type = type,
             device_id = device.device_id,
-            apparaatnaam = row.Cell(2).GetString().Trim(),
-            merk = row.Cell(4).GetString().Trim(),
-            serial_number = row.Cell(5).GetString().Trim(),
-            aantal = int.TryParse(row.Cell(6).GetString(), out int a) ? a : null,
-            LokaalId = await GetLokaalId(dbContext, row.Cell(8).GetString()),
-            status = row.Cell(9).GetString().Trim(),
-            staat = row.Cell(9).GetString().Trim(),
-            leverancier = row.Cell(10).GetString().Trim(),
-            aankoopdatum = row.Cell(11).TryGetValue(out DateTime d1) ? d1 : null,
-            eind_garantie = row.Cell(12).TryGetValue(out DateTime d2) ? d2 : null
+            apparaatnaam = CleanValue(row.Cell(naamIdx).GetString()),
+            merk = CleanValue(row.Cell(merkIdx).GetString()),
+            model = CleanValue(row.Cell(modelIdx).GetString()),
+            serial_number = CleanValue(row.Cell(snIdx).GetString()),
+            aantal = int.TryParse(row.Cell(aantalIdx).GetString(), out int a) ? a : null,
+            LokaalId = await GetLokaalId(dbContext, row.Cell(lokaalIdx).GetString()),
+            staat = CleanValue(row.Cell(staatIdx).GetString()),
+            status = "Active", // Default status
+            leverancier = CleanValue(row.Cell(verkoperIdx).GetString()),
+            aankoopdatum = ParseExcelDate(row.Cell(aankoopIdx)),
+            eind_garantie = ParseExcelDate(row.Cell(garantieIdx))
         };
         dbContext.Infos.Add(info);
     }
@@ -305,9 +363,21 @@ async Task SeedStudentenPCs(InventarisContext dbContext, XLWorkbook wb)
     var sheet = wb.Worksheet("Studenten_pcs");
     var rows = sheet.RangeUsed().RowsUsed().Skip(1);
 
+    int naamIdx = GetCol(sheet, "Naam");
+    int typeIdx = GetCol(sheet, "Type");
+    int merkIdx = GetCol(sheet, "Merk");
+    int modelIdx = GetCol(sheet, "Model");
+    int snIdx = GetCol(sheet, "Serienummer");
+    int aantalIdx = GetCol(sheet, "Aantal");
+    int lokaalIdx = GetCol(sheet, "Lokaal");
+    int staatIdx = GetCol(sheet, "Staat");
+    int verkoperIdx = GetCol(sheet, "Verkoper");
+    int aankoopIdx = GetCol(sheet, "Aankoopdatum");
+    int garantieIdx = GetCol(sheet, "Einde garantie");
+
     foreach (var row in rows)
     {
-        var type = row.Cell(3).GetString().Trim();
+        var type = CleanValue(row.Cell(typeIdx).GetString());
         if (string.IsNullOrEmpty(type)) continue;
 
         var device = new InventarisApp.Models.Device { type = type };
@@ -318,16 +388,17 @@ async Task SeedStudentenPCs(InventarisContext dbContext, XLWorkbook wb)
         {
             type = type,
             device_id = device.device_id,
-            apparaatnaam = row.Cell(2).GetString().Trim(),
-            merk = row.Cell(4).GetString().Trim(),
-            serial_number = row.Cell(5).GetString().Trim(),
-            aantal = int.TryParse(row.Cell(6).GetString(), out int a) ? a : null,
-            LokaalId = await GetLokaalId(dbContext, row.Cell(8).GetString()),
-            status = row.Cell(9).GetString().Trim(),
-            staat = row.Cell(9).GetString().Trim(),
-            leverancier = row.Cell(10).GetString().Trim(),
-            aankoopdatum = row.Cell(11).TryGetValue(out DateTime d1) ? d1 : null,
-            eind_garantie = row.Cell(12).TryGetValue(out DateTime d2) ? d2 : null
+            apparaatnaam = CleanValue(row.Cell(naamIdx).GetString()),
+            merk = CleanValue(row.Cell(merkIdx).GetString()),
+            model = CleanValue(row.Cell(modelIdx).GetString()),
+            serial_number = CleanValue(row.Cell(snIdx).GetString()),
+            aantal = int.TryParse(row.Cell(aantalIdx).GetString(), out int a) ? a : null,
+            LokaalId = await GetLokaalId(dbContext, row.Cell(lokaalIdx).GetString()),
+            staat = CleanValue(row.Cell(staatIdx).GetString()),
+            status = "Active",
+            leverancier = CleanValue(row.Cell(verkoperIdx).GetString()),
+            aankoopdatum = ParseExcelDate(row.Cell(aankoopIdx)),
+            eind_garantie = ParseExcelDate(row.Cell(garantieIdx))
         };
         dbContext.Infos.Add(info);
     }
@@ -340,40 +411,54 @@ async Task SeedAdministratiePCs(InventarisContext dbContext, XLWorkbook wb)
     var sheet = wb.Worksheet("Administratie_pcs");
     var rows = sheet.RangeUsed().RowsUsed().Skip(1);
 
+    int naamIdx = GetCol(sheet, "Naam");
+    int typeIdx = GetCol(sheet, "Type");
+    int merkIdx = GetCol(sheet, "Merk");
+    int modelIdx = GetCol(sheet, "Model");
+    int snIdx = GetCol(sheet, "Serienummer");
+    int aantalIdx = GetCol(sheet, "Aantal");
+    int verdiepIdx = GetCol(sheet, "Verdiep");
+    int lokaalIdx = GetCol(sheet, "Lokaal");
+    int staatIdx = GetCol(sheet, "Staat");
+    int verkoperIdx = GetCol(sheet, "Verkoper");
+    int aankoopIdx = GetCol(sheet, "aankoopdatum");
+    int garantieIdx = GetCol(sheet, "einde garantie");
+
     foreach (var row in rows)
     {
-        var type = row.Cell(3).GetString().Trim();
+        var type = CleanValue(row.Cell(typeIdx).GetString());
         if (string.IsNullOrEmpty(type)) continue;
 
         var device = new InventarisApp.Models.Device { type = type };
         dbContext.Devices.Add(device);
         await dbContext.SaveChangesAsync();
 
-        var verdiep = row.Cell(7).GetString().Trim().ToLower();
-        var lokaalOfPersoon = row.Cell(8).GetString().Trim();
+        var verdiep = CleanValue(row.Cell(verdiepIdx).GetString())?.ToLower();
+        var lokaalOrPerson = row.Cell(lokaalIdx).GetString();
 
         var info = new InventarisApp.Models.Info
         {
             type = type,
             device_id = device.device_id,
-            apparaatnaam = row.Cell(2).GetString().Trim(),
-            merk = row.Cell(4).GetString().Trim(),
-            serial_number = row.Cell(5).GetString().Trim(),
-            aantal = int.TryParse(row.Cell(6).GetString(), out int a) ? a : null,
-            status = row.Cell(9).GetString().Trim(),
-            staat = row.Cell(9).GetString().Trim(),
-            leverancier = row.Cell(10).GetString().Trim(),
-            aankoopdatum = row.Cell(11).TryGetValue(out DateTime d1) ? d1 : null,
-            eind_garantie = row.Cell(12).TryGetValue(out DateTime d2) ? d2 : null
+            apparaatnaam = CleanValue(row.Cell(naamIdx).GetString()),
+            merk = CleanValue(row.Cell(merkIdx).GetString()),
+            model = CleanValue(row.Cell(modelIdx).GetString()),
+            serial_number = CleanValue(row.Cell(snIdx).GetString()),
+            aantal = int.TryParse(row.Cell(aantalIdx).GetString(), out int a) ? a : null,
+            staat = CleanValue(row.Cell(staatIdx).GetString()),
+            status = "Active",
+            leverancier = CleanValue(row.Cell(verkoperIdx).GetString()),
+            aankoopdatum = ParseExcelDate(row.Cell(aankoopIdx)),
+            eind_garantie = ParseExcelDate(row.Cell(garantieIdx))
         };
 
         if (verdiep == "persoon")
         {
-            info.PersoonId = await GetPersoonId(dbContext, lokaalOfPersoon);
+            info.PersoonId = await GetPersoonId(dbContext, lokaalOrPerson);
         }
         else
         {
-            info.LokaalId = await GetLokaalId(dbContext, lokaalOfPersoon);
+            info.LokaalId = await GetLokaalId(dbContext, lokaalOrPerson);
         }
 
         dbContext.Infos.Add(info);
@@ -387,9 +472,18 @@ async Task SeedProjectie(InventarisContext dbContext, XLWorkbook wb)
     var sheet = wb.Worksheet("Projectie");
     var rows = sheet.RangeUsed().RowsUsed().Skip(1);
 
+    int naamIdx = GetCol(sheet, "Naam");
+    int typeIdx = GetCol(sheet, "Type");
+    int merkIdx = GetCol(sheet, "Merk");
+    int modelIdx = GetCol(sheet, "Model");
+    int aantalIdx = GetCol(sheet, "Aantal");
+    int lokaalIdx = GetCol(sheet, "Lokaal");
+    int staatIdx = GetCol(sheet, "Staat");
+    int opmIdx = GetCol(sheet, "Opmerkingen");
+
     foreach (var row in rows)
     {
-        var type = row.Cell(3).GetString().Trim();
+        var type = CleanValue(row.Cell(typeIdx).GetString());
         if (string.IsNullOrEmpty(type)) continue;
 
         var device = new InventarisApp.Models.Device { type = type };
@@ -400,14 +494,14 @@ async Task SeedProjectie(InventarisContext dbContext, XLWorkbook wb)
         {
             type = type,
             device_id = device.device_id,
-            apparaatnaam = row.Cell(2).GetString().Trim(),
-            merk = row.Cell(4).GetString().Trim(),
-            model = row.Cell(5).GetString().Trim(),
-            aantal = int.TryParse(row.Cell(6).GetString(), out int a) ? a : null,
-            LokaalId = await GetLokaalId(dbContext, row.Cell(8).GetString()),
-            staat = row.Cell(9).GetString().Trim(),
-            status = row.Cell(9).GetString().Trim(),
-            opmerkingen = row.Cell(10).GetString().Trim()
+            apparaatnaam = CleanValue(row.Cell(naamIdx).GetString()),
+            merk = CleanValue(row.Cell(merkIdx).GetString()),
+            model = CleanValue(row.Cell(modelIdx).GetString()),
+            aantal = int.TryParse(row.Cell(aantalIdx).GetString(), out int a) ? a : null,
+            LokaalId = await GetLokaalId(dbContext, row.Cell(lokaalIdx).GetString()),
+            staat = CleanValue(row.Cell(staatIdx).GetString()),
+            status = "Active",
+            opmerkingen = CleanValue(row.Cell(opmIdx).GetString())
         };
         dbContext.Infos.Add(info);
     }
@@ -420,9 +514,17 @@ async Task SeedNetwerk(InventarisContext dbContext, XLWorkbook wb)
     var sheet = wb.Worksheet("Netwerk");
     var rows = sheet.RangeUsed().RowsUsed().Skip(1);
 
+    int naamIdx = GetCol(sheet, "Naam");
+    int typeIdx = GetCol(sheet, "Type");
+    int merkIdx = GetCol(sheet, "Merk");
+    int modelIdx = GetCol(sheet, "Model");
+    int snIdx = GetCol(sheet, "Serienummer");
+    int lokaalIdx = GetCol(sheet, "Lokaal");
+    int ipIdx = GetCol(sheet, "IP");
+
     foreach (var row in rows)
     {
-        var type = row.Cell(2).GetString().Trim();
+        var type = CleanValue(row.Cell(typeIdx).GetString());
         if (string.IsNullOrEmpty(type)) continue;
 
         var device = new InventarisApp.Models.Device { type = type };
@@ -433,11 +535,13 @@ async Task SeedNetwerk(InventarisContext dbContext, XLWorkbook wb)
         {
             type = type,
             device_id = device.device_id,
-            apparaatnaam = row.Cell(1).GetString().Trim(),
-            merk = row.Cell(3).GetString().Trim(),
-            serial_number = row.Cell(4).GetString().Trim(),
-            LokaalId = await GetLokaalId(dbContext, row.Cell(6).GetString()),
-            ip = row.Cell(7).GetString().Trim()
+            apparaatnaam = CleanValue(row.Cell(naamIdx).GetString()),
+            merk = CleanValue(row.Cell(merkIdx).GetString()),
+            model = CleanValue(row.Cell(modelIdx).GetString()),
+            serial_number = CleanValue(row.Cell(snIdx).GetString()),
+            LokaalId = await GetLokaalId(dbContext, row.Cell(lokaalIdx).GetString()),
+            ip = CleanValue(row.Cell(ipIdx).GetString()),
+            status = "Active"
         };
         dbContext.Infos.Add(info);
     }
