@@ -52,8 +52,14 @@ namespace InventarisApp.Migrations
                     b.Property<int?>("LokaalId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PersoonId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("aankoopdatum")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("aantal")
+                        .HasColumnType("int");
 
                     b.Property<string>("apparaatnaam")
                         .HasMaxLength(100)
@@ -62,9 +68,6 @@ namespace InventarisApp.Migrations
                     b.Property<DateTime?>("eind_garantie")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("eind garantie");
-
-                    b.Property<int?>("garantie")
-                        .HasColumnType("int");
 
                     b.Property<string>("ip")
                         .HasMaxLength(50)
@@ -82,10 +85,18 @@ namespace InventarisApp.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<string>("opmerkingen")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
                     b.Property<string>("serial_number")
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")
                         .HasColumnName("serial number");
+
+                    b.Property<string>("staat")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("status")
                         .HasMaxLength(50)
@@ -94,6 +105,8 @@ namespace InventarisApp.Migrations
                     b.HasKey("type", "device_id");
 
                     b.HasIndex("LokaalId");
+
+                    b.HasIndex("PersoonId");
 
                     b.HasIndex("device_id");
 
@@ -296,7 +309,7 @@ namespace InventarisApp.Migrations
                         {
                             Id = 1,
                             IsActive = true,
-                            PasswordHash = "$2a$11$eNfFxyOQ/7o76hXwE/18/.M9v2vDkY6m8tP51BwEZyV44Qx74o77G",
+                            PasswordHash = "$2a$11$PvpjYYC97f/m/YhWHquU6uF8v9iLuionEc0xtFSmZSdh7v8zgDw9.",
                             Role = "Admin",
                             Username = "admin"
                         });
@@ -340,6 +353,10 @@ namespace InventarisApp.Migrations
                         .HasForeignKey("LokaalId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("InventarisApp.Models.Persoon", "Persoon")
+                        .WithMany()
+                        .HasForeignKey("PersoonId");
+
                     b.HasOne("InventarisApp.Models.Device", "Device")
                         .WithMany("Infos")
                         .HasForeignKey("device_id")
@@ -349,6 +366,8 @@ namespace InventarisApp.Migrations
                     b.Navigation("Device");
 
                     b.Navigation("Lokaal");
+
+                    b.Navigation("Persoon");
                 });
 
             modelBuilder.Entity("InventarisApp.Models.Lening", b =>

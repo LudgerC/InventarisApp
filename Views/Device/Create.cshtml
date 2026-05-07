@@ -72,31 +72,34 @@
                         </div>
                     </div>
 
-                    <h5 class="text-primary border-bottom pb-2 mt-4 mb-3">Aankoop Informatie</h5>
+                    <h5 class="text-primary border-bottom pb-2 mt-4 mb-3">Extra Informatie</h5>
                     <div class="row g-3">
                          <div class="col-md-6 form-floating mb-3">
                             <input asp-for="leverancier" class="form-control" placeholder="Leverancier" />
                             <label asp-for="leverancier" class="ms-2">Leverancier</label>
                             <span asp-validation-for="leverancier" class="text-danger small"></span>
                         </div>
+                        <div class="col-md-4 form-floating mb-3">
+                            <input asp-for="aantal" class="form-control" placeholder="Aantal" type="number" min="0" />
+                            <label asp-for="aantal" class="ms-2">Aantal</label>
+                            <span asp-validation-for="aantal" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 form-floating mb-3">
+                            <input asp-for="staat" class="form-control" placeholder="Staat" />
+                            <label asp-for="staat" class="ms-2">Staat</label>
+                            <span asp-validation-for="staat" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 form-floating mb-3">
+                            <textarea asp-for="opmerkingen" class="form-control" placeholder="Opmerkingen" style="height: 100px"></textarea>
+                            <label asp-for="opmerkingen" class="ms-2">Opmerkingen</label>
+                            <span asp-validation-for="opmerkingen" class="text-danger small"></span>
+                        </div>
                         <div class="col-md-6 form-floating mb-3">
-                            <select id="warrantyToggle" class="form-select" onchange="updateWarrantyFields()">
-                                <option value="nee">Nee</option>
-                                <option value="ja">Ja</option>
-                            </select>
-                            <label for="warrantyToggle" class="ms-2">Heeft het apparaat garantie?</label>
-                        </div>
-                        <div class="col-md-4 form-floating mb-3 warranty-field">
-                            <input asp-for="garantie" id="garantieField" class="form-control" placeholder="Garantie" type="number" min="0" />
-                            <label asp-for="garantie" class="ms-2">Garantie (Maanden)</label>
-                            <span asp-validation-for="garantie" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-4 form-floating mb-3 warranty-field">
                             <input asp-for="aankoopdatum" id="aankoopdatumField" class="form-control" type="text" placeholder="dd/mm/jjjj" />
                             <label asp-for="aankoopdatum" class="ms-2">Aankoopdatum</label>
                             <span class="text-muted small ms-2">Formaat: dd/mm/jjjj</span>
                         </div>
-                        <div class="col-md-4 form-floating mb-3 warranty-field">
+                        <div class="col-md-6 form-floating mb-3">
                             <input asp-for="eind_garantie" id="eindGarantieField" class="form-control" type="text" placeholder="dd/mm/jjjj" />
                             <label asp-for="eind_garantie" class="ms-2">Einde Garantie</label>
                             <span class="text-muted small ms-2">Formaat: dd/mm/jjjj</span>
@@ -129,19 +132,6 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
-        function updateWarrantyFields() {
-            var hasWarranty = document.getElementById("warrantyToggle").value === "ja";
-            var fields = ["garantieField", "aankoopdatumField", "eindGarantieField"];
-            
-            fields.forEach(function(fieldId) {
-                var field = document.getElementById(fieldId);
-                field.disabled = !hasWarranty;
-                if (!hasWarranty) {
-                    field.value = "";
-                }
-            });
-        }
-
         function toggleIpField() {
             var hasIp = document.getElementById("hasIpCheckbox").checked;
             var ipField = document.getElementById("ipField");
@@ -153,7 +143,6 @@
 
         // Initialize on page load
         document.addEventListener("DOMContentLoaded", function() {
-            updateWarrantyFields();
             toggleIpField();
 
             new TomSelect('#typeSelect', {

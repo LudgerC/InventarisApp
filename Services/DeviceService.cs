@@ -86,7 +86,10 @@ namespace InventarisApp.Services
             existingInfo.status = info.status;
             existingInfo.serial_number = info.serial_number;
             existingInfo.leverancier = info.leverancier;
-            existingInfo.garantie = info.garantie;
+            existingInfo.aantal = info.aantal;
+            existingInfo.opmerkingen = info.opmerkingen;
+            existingInfo.staat = info.staat;
+            existingInfo.PersoonId = info.PersoonId;
             existingInfo.aankoopdatum = info.aankoopdatum;
             existingInfo.eind_garantie = info.eind_garantie;
 

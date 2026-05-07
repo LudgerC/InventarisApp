@@ -89,24 +89,27 @@
                         </div>
                     </div>
 
-                    <h5 class="text-secondary border-bottom pb-2 mt-4 mb-3">Garantie Informatie</h5>
+                    <h5 class="text-secondary border-bottom pb-2 mt-4 mb-3">Extra Informatie</h5>
                     <div class="row g-3">
-                        <div class="col-md-6 form-floating mb-3">
-                            <select id="warrantyToggle" class="form-select" onchange="updateWarrantyFields()">
-                                @if (Model.garantie > 0 || Model.aankoopdatum.HasValue) {
-                                    <option value="nee">Nee</option>
-                                    <option value="ja" selected="selected">Ja</option>
-                                } else {
-                                    <option value="nee" selected="selected">Nee</option>
-                                    <option value="ja">Ja</option>
-                                }
-                            </select>
-                            <label for="warrantyToggle" class="ms-2">Heeft het apparaat garantie?</label>
+                        <div class="col-md-4 form-floating mb-3">
+                            <input asp-for="aantal" class="form-control" placeholder="Aantal" type="number" min="0" />
+                            <label asp-for="aantal" class="ms-2">Aantal</label>
+                            <span asp-validation-for="aantal" class="text-danger small"></span>
                         </div>
-                        <div class="col-md-6 form-floating mb-3 warranty-field">
-                            <input asp-for="garantie" id="garantieField" class="form-control" placeholder="Garantie" type="number" min="0" />
-                            <label asp-for="garantie" class="ms-2">Garantie (Maanden)</label>
-                            <span asp-validation-for="garantie" class="text-danger small"></span>
+                        <div class="col-md-4 form-floating mb-3">
+                            <input asp-for="staat" class="form-control" placeholder="Staat" />
+                            <label asp-for="staat" class="ms-2">Staat</label>
+                            <span asp-validation-for="staat" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 form-floating mb-3">
+                            <input asp-for="PersoonId" class="form-control" placeholder="Persoon ID" type="number" />
+                            <label asp-for="PersoonId" class="ms-2">Persoon ID</label>
+                            <span asp-validation-for="PersoonId" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 form-floating mb-3">
+                            <textarea asp-for="opmerkingen" class="form-control" placeholder="Opmerkingen" style="height: 100px"></textarea>
+                            <label asp-for="opmerkingen" class="ms-2">Opmerkingen</label>
+                            <span asp-validation-for="opmerkingen" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6 form-floating mb-3 warranty-field">
                             <input asp-for="aankoopdatum" id="aankoopdatumField" class="form-control" type="text" placeholder="dd/mm/jjjj" />
@@ -136,17 +139,7 @@
     <script>
         function updateWarrantyFields() {
             var hasWarranty = document.getElementById("warrantyToggle").value === "ja";
-            var fields = ["garantieField", "aankoopdatumField", "eindGarantieField"];
-            
-            fields.forEach(function(fieldId) {
-                var field = document.getElementById(fieldId);
-                field.disabled = !hasWarranty;
-            });
-        }
-
-        function handleWarrantyChange() {
-             var hasWarranty = document.getElementById("warrantyToggle").value === "ja";
-             var fields = ["garantieField", "aankoopdatumField", "eindGarantieField"];
+            var fields = ["aankoopdatumField", "eindGarantieField"];
              fields.forEach(function(fieldId) {
                 var field = document.getElementById(fieldId);
                 field.disabled = !hasWarranty;
