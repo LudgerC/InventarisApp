@@ -1,0 +1,155 @@
+@model InventarisApp.Models.Info
+
+@{
+    ViewData["Title"] = "Apparaat Details";
+}
+
+<div class="row min-vh-100 align-items-center justify-content-center bg-light">
+    <div class="col-md-8 col-lg-6 py-5">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-info text-white text-center py-3 rounded-top-4">
+                <h3 class="mb-0 fw-bold">Details - @(string.IsNullOrEmpty(Model.apparaatnaam) ? Model.merk : Model.apparaatnaam)</h3>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <h5 class="text-info border-bottom pb-2 mb-3">Basis Informatie</h5>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Type:</div>
+                    <div class="col-sm-8">@Model.type</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">ID:</div>
+                    <div class="col-sm-8">@Model.device_id</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Merk:</div>
+                    <div class="col-sm-8">@Model.merk</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Model:</div>
+                    <div class="col-sm-8">@Model.model</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Serienummer:</div>
+                    <div class="col-sm-8">@Model.serial_number</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">IP Adres:</div>
+                    <div class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.ip))
+                        {
+                            <code>@Model.ip</code>
+                        }
+                        else
+                        {
+                            <span class="text-muted">N.v.t.</span>
+                        }
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Status:</div>
+                    <div class="col-sm-8">
+                        @{
+                            var badgeClass = Model.status switch
+                            {
+                                "Active" => "bg-success",
+                                "Inactive" => "bg-secondary",
+                                "Maintenance" => "bg-warning text-dark",
+                                _ => "bg-light text-dark"
+                            };
+                            var statusLabel = Model.status switch
+                            {
+                                "Active" => "Actief",
+                                "Inactive" => "Inactief",
+                                "Maintenance" => "Onderhoud",
+                                _ => Model.status
+                            };
+                        }
+                        <span class="badge @badgeClass">@statusLabel</span>
+                    </div>
+                </div>
+
+                @if (Model.type == "Printer")
+                {
+                    <h5 class="text-info border-bottom pb-2 mt-4 mb-3">Printer Eigenschappen</h5>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-bold text-muted">Wachtwoord:</div>
+                        <div class="col-sm-8">@(string.IsNullOrEmpty(Model.wachtwoord) ? "-" : Model.wachtwoord)</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-bold text-muted">Toner:</div>
+                        <div class="col-sm-8">@(string.IsNullOrEmpty(Model.toner) ? "-" : Model.toner)</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-bold text-muted">Kleur:</div>
+                        <div class="col-sm-8">
+                            @if (Model.kleur == true) { <i class="bi bi-check-circle-fill text-success"></i> }
+                            else { <i class="bi bi-x-circle-fill text-danger"></i> }
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-bold text-muted">Nietjes:</div>
+                        <div class="col-sm-8">
+                            @if (Model.nietjes == true) { <i class="bi bi-check-circle-fill text-success"></i> }
+                            else { <i class="bi bi-x-circle-fill text-danger"></i> }
+                        </div>
+                    </div>
+                }
+
+                <h5 class="text-info border-bottom pb-2 mt-4 mb-3">Toewijzing & Extra Informatie</h5>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Lokaal:</div>
+                    <div class="col-sm-8">
+                        @if (Model.Lokaal != null)
+                        {
+                            <a asp-controller="Lokaal" asp-action="Details" asp-route-id="@Model.LokaalId" class="text-decoration-none">
+                                @(Model.Lokaal.IsExtern ? "Extern: " : (Model.Lokaal.Locatie?.Afkorting + " - "))@Model.Lokaal.Naam
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Niet toegewezen</span>
+                        }
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Persoon:</div>
+                    <div class="col-sm-8">
+                        @(Model.Persoon != null ? $"{Model.Persoon.Naam} {Model.Persoon.Achternaam}" : "Niet toegewezen")
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Staat:</div>
+                    <div class="col-sm-8">@(string.IsNullOrEmpty(Model.staat) ? "-" : Model.staat)</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Leverancier:</div>
+                    <div class="col-sm-8">@Model.leverancier</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Aankoopdatum:</div>
+                    <div class="col-sm-8">@(Model.aankoopdatum?.ToString("dd/MM/yyyy") ?? "-")</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold text-muted">Einde Garantie:</div>
+                    <div class="col-sm-8">@(Model.eind_garantie?.ToString("dd/MM/yyyy") ?? "-")</div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.opmerkingen))
+                {
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-bold text-muted">Opmerkingen:</div>
+                        <div class="col-sm-8">@Model.opmerkingen</div>
+                    </div>
+                }
+
+                <div class="mt-5 pt-3 border-top d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-left me-1"></i> Terug
+                    </a>
+                    <a asp-action="Edit" asp-route-type="@Model.type" asp-route-deviceId="@Model.device_id" class="btn btn-primary px-4 shadow-sm">
+                        <i class="bi bi-pencil me-1"></i> Bewerken
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

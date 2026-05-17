@@ -106,6 +106,34 @@
                         </div>
                     </div>
 
+                    <div id="printerPropertiesSection" style="display: none;">
+                        <h5 class="text-primary border-bottom pb-2 mt-4 mb-3">Printer Eigenschappen</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6 form-floating mb-3">
+                                <input asp-for="wachtwoord" class="form-control" placeholder="Wachtwoord" />
+                                <label asp-for="wachtwoord" class="ms-2">Wachtwoord</label>
+                                <span asp-validation-for="wachtwoord" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 form-floating mb-3">
+                                <input asp-for="toner" class="form-control" placeholder="Toner type" />
+                                <label asp-for="toner" class="ms-2">Toner</label>
+                                <span asp-validation-for="toner" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch pt-2">
+                                    <input name="kleur" class="form-check-input" type="checkbox" value="true" checked="@(Model?.kleur == true)" />
+                                    <label class="form-check-label ms-2">Print in Kleur?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch pt-2">
+                                    <input name="nietjes" class="form-check-input" type="checkbox" value="true" checked="@(Model?.nietjes == true)" />
+                                    <label class="form-check-label ms-2">Heeft Nietjes-functie?</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <h5 class="text-primary border-bottom pb-2 mt-4 mb-3">Optionele WiFi</h5>
                     <div class="row g-3">
                         <div class="col-md-6 form-floating mb-3">
@@ -141,14 +169,31 @@
             }
         }
 
+        function togglePrinterFields(typeValue) {
+            var printerSection = document.getElementById("printerPropertiesSection");
+            if (typeValue === "Printer") {
+                printerSection.style.display = "block";
+            } else {
+                printerSection.style.display = "none";
+            }
+        }
+
         // Initialize on page load
         document.addEventListener("DOMContentLoaded", function() {
             toggleIpField();
 
-            new TomSelect('#typeSelect', {
+            var typeSelect = new TomSelect('#typeSelect', {
                 create: false,
-                sortField: { field: 'text', order: 'asc' }
+                sortField: { field: 'text', order: 'asc' },
+                onChange: function(value) {
+                    togglePrinterFields(value);
+                }
             });
+            
+            // Set initial state
+            if (typeSelect) {
+                togglePrinterFields(typeSelect.getValue());
+            }
         });
     </script>
 }

@@ -2,9 +2,10 @@
 
 @{
     ViewData["Title"] = "Uitleningen Overzicht";
+    ViewData["ContainerClass"] = "container-fluid";
 }
 
-<div class="container-fluid mt-4">
+<div class="mt-4" style="max-width: 95%; margin: 0 auto;">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-gradient" style="font-family: 'Outfit', sans-serif;">Beheer Leningen</h2>
         <div>
@@ -17,16 +18,86 @@
         </div>
     </div>
 
+    <!-- Filters en Sorteren -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body bg-light rounded">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold"><i class="bi bi-search me-1"></i> Zoeken</label>
+                    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Persoon, Apparaat, ID...">
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold"><i class="bi bi-activity me-1"></i> Status</label>
+                    <select name="statusFilter" class="form-select">
+                        <option value="">Alle statussen</option>
+                        @if (ViewData["CurrentStatus"]?.ToString() == "Active") { <option value="Active" selected="selected">Actief</option> } else { <option value="Active">Actief</option> }
+                        @if (ViewData["CurrentStatus"]?.ToString() == "Afgerond") { <option value="Afgerond" selected="selected">Afgerond</option> } else { <option value="Afgerond">Afgerond</option> }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-filter"></i> Toepassen
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary" title="Filters wissen">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="table-responsive shadow-sm rounded">
         <table class="table table-hover table-striped align-middle mb-0">
             <thead class="table-dark">
                 <tr>
-                    <th>Lening ID</th>
-                    <th>Persoon</th>
-                    <th>Apparaat</th>
-                    <th>Startdatum</th>
-                    <th>Einddatum</th>
-                    <th>Status</th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["IdSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" class="text-white text-decoration-none d-flex align-items-center">
+                            Lening ID
+                            @if (string.IsNullOrEmpty(ViewData["CurrentSort"]?.ToString())) { <i class="bi bi-sort-numeric-down ms-1"></i> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "id_desc") { <i class="bi bi-sort-numeric-up ms-1"></i> }
+                            else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["PersoonSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" class="text-white text-decoration-none d-flex align-items-center">
+                            Persoon
+                            @if (ViewData["CurrentSort"]?.ToString() == "persoon_asc") { <i class="bi bi-sort-alpha-down ms-1"></i> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "persoon_desc") { <i class="bi bi-sort-alpha-up ms-1"></i> }
+                            else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["ApparaatSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" class="text-white text-decoration-none d-flex align-items-center">
+                            Apparaat
+                            @if (ViewData["CurrentSort"]?.ToString() == "apparaat_asc") { <i class="bi bi-sort-alpha-down ms-1"></i> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "apparaat_desc") { <i class="bi bi-sort-alpha-up ms-1"></i> }
+                            else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["StartSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" class="text-white text-decoration-none d-flex align-items-center">
+                            Startdatum
+                            @if (ViewData["CurrentSort"]?.ToString() == "start_asc") { <i class="bi bi-sort-numeric-down ms-1"></i> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "start_desc") { <i class="bi bi-sort-numeric-up ms-1"></i> }
+                            else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["EindSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" class="text-white text-decoration-none d-flex align-items-center">
+                            Einddatum
+                            @if (ViewData["CurrentSort"]?.ToString() == "eind_asc") { <i class="bi bi-sort-numeric-down ms-1"></i> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "eind_desc") { <i class="bi bi-sort-numeric-up ms-1"></i> }
+                            else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["StatusSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" class="text-white text-decoration-none d-flex align-items-center">
+                            Status
+                            @if (ViewData["CurrentSort"]?.ToString() == "status_asc") { <i class="bi bi-sort-down ms-1"></i> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "status_desc") { <i class="bi bi-sort-up ms-1"></i> }
+                            else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                        </a>
+                    </th>
                     <th class="text-center">Acties</th>
                 </tr>
             </thead>
@@ -74,23 +145,23 @@
                         <td class="text-center">
                             <div class="btn-group">
                                 <a asp-action="Details" asp-route-id="@item.ID" class="btn btn-sm btn-outline-info" title="Details zien">
-                                    <i class="bi bi-eye"></i>
+                                    <i class="bi bi-eye"></i> Details
                                 </a>
                                 <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-secondary" title="Aanpassen">
-                                    <i class="bi bi-pencil"></i>
+                                    <i class="bi bi-pencil"></i> Bewerken
                                 </a>
                                 @if(!isAfgerond)
                                 {
-                                    <form asp-action="Retourneer" asp-route-id="@item.ID" method="post" class="d-inline">
+                                    <form asp-action="Retourneer" asp-route-id="@item.ID" method="post" class="d-inline ms-1">
                                         <button type="submit" class="btn btn-sm btn-outline-warning" title="Retourneren (Stop lenen)" onclick="return confirm('Weet u zeker dat dit apparaat geretourneerd is?');">
-                                            <i class="bi bi-arrow-return-left"></i>
+                                            <i class="bi bi-arrow-return-left"></i> Retour
                                         </button>
                                     </form>
                                 }
-                                <button type="button" class="btn btn-sm btn-outline-danger delete-btn" 
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-btn ms-1" 
                                         data-action="@Url.Action("Delete", "Lening", new { id = item.ID })"
                                         title="Verwijderen">
-                                    <i class="bi bi-trash"></i>
+                                    <i class="bi bi-trash"></i> Verwijderen
                                 </button>
                             </div>
                         </td>

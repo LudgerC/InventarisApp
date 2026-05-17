@@ -20,9 +20,45 @@ namespace InventarisApp.Controllers
         }
 
         // GET: Lokaal
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
-            return View(await _context.Lokalen.Include(l => l.Locatie).ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NaamSortParm"] = String.IsNullOrEmpty(sortOrder) ? "naam_desc" : "";
+            ViewData["CampusSortParm"] = sortOrder == "Campus" ? "campus_desc" : "Campus";
+            ViewData["PlaatsenSortParm"] = sortOrder == "Plaatsen" ? "plaatsen_desc" : "Plaatsen";
+            ViewData["TypeSortParm"] = sortOrder == "Type" ? "type_desc" : "Type";
+
+            var lokalen = _context.Lokalen.Include(l => l.Locatie).AsQueryable();
+
+            switch (sortOrder)
+            {
+                case "naam_desc":
+                    lokalen = lokalen.OrderByDescending(l => l.Naam);
+                    break;
+                case "Campus":
+                    lokalen = lokalen.OrderBy(l => l.Locatie != null ? l.Locatie.Naam : "Z");
+                    break;
+                case "campus_desc":
+                    lokalen = lokalen.OrderByDescending(l => l.Locatie != null ? l.Locatie.Naam : "A");
+                    break;
+                case "Plaatsen":
+                    lokalen = lokalen.OrderBy(l => l.AantalPlaatsen);
+                    break;
+                case "plaatsen_desc":
+                    lokalen = lokalen.OrderByDescending(l => l.AantalPlaatsen);
+                    break;
+                case "Type":
+                    lokalen = lokalen.OrderBy(l => l.IsExtern);
+                    break;
+                case "type_desc":
+                    lokalen = lokalen.OrderByDescending(l => l.IsExtern);
+                    break;
+                default:
+                    lokalen = lokalen.OrderBy(l => l.Naam);
+                    break;
+            }
+
+            return View(await lokalen.ToListAsync());
         }
 
         // GET: Lokaal/Details/5

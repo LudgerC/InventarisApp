@@ -27,11 +27,39 @@
                     <table class="table table-hover mb-0 align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th class="ps-4">Naam</th>
-                                <th>Campus</th>
-                                <th class="text-center">Plaatsen</th>
-                                <th class="text-center">Type</th>
-                                <th class="text-end pe-4">Acties</th>
+                                <th class="ps-4">
+                                    <a asp-action="Index" asp-route-sortOrder="@ViewData["NaamSortParm"]" class="text-white text-decoration-none d-flex align-items-center">
+                                        Naam
+                                        @if (ViewData["CurrentSort"]?.ToString() == "naam_desc") { <i class="bi bi-sort-alpha-up ms-1"></i> }
+                                        else if (string.IsNullOrEmpty(ViewData["CurrentSort"]?.ToString())) { <i class="bi bi-sort-alpha-down ms-1"></i> }
+                                        else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                                    </a>
+                                </th>
+                                <th>
+                                    <a asp-action="Index" asp-route-sortOrder="@ViewData["CampusSortParm"]" class="text-white text-decoration-none d-flex align-items-center">
+                                        Campus
+                                        @if (ViewData["CurrentSort"]?.ToString() == "Campus") { <i class="bi bi-sort-alpha-down ms-1"></i> }
+                                        else if (ViewData["CurrentSort"]?.ToString() == "campus_desc") { <i class="bi bi-sort-alpha-up ms-1"></i> }
+                                        else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                                    </a>
+                                </th>
+                                <th>
+                                    <a asp-action="Index" asp-route-sortOrder="@ViewData["PlaatsenSortParm"]" class="text-white text-decoration-none d-flex align-items-center justify-content-center">
+                                        Plaatsen
+                                        @if (ViewData["CurrentSort"]?.ToString() == "Plaatsen") { <i class="bi bi-sort-numeric-down ms-1"></i> }
+                                        else if (ViewData["CurrentSort"]?.ToString() == "plaatsen_desc") { <i class="bi bi-sort-numeric-up ms-1"></i> }
+                                        else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                                    </a>
+                                </th>
+                                <th>
+                                    <a asp-action="Index" asp-route-sortOrder="@ViewData["TypeSortParm"]" class="text-white text-decoration-none d-flex align-items-center justify-content-center">
+                                        Type
+                                        @if (ViewData["CurrentSort"]?.ToString() == "Type") { <i class="bi bi-sort-down ms-1"></i> }
+                                        else if (ViewData["CurrentSort"]?.ToString() == "type_desc") { <i class="bi bi-sort-up ms-1"></i> }
+                                        else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                                    </a>
+                                </th>
+                                <th class="text-end pe-4 text-white">Acties</th>
                             </tr>
                         </thead>
                         <tbody>

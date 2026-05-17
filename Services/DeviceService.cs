@@ -30,6 +30,7 @@ namespace InventarisApp.Services
             return await _context.Infos
                 .Include(i => i.Device)
                 .Include(i => i.Wifis)
+                .AsSplitQuery()
                 .ToListAsync();
         }
 
@@ -38,6 +39,9 @@ namespace InventarisApp.Services
             return await _context.Infos
                 .Include(i => i.Device)
                 .Include(i => i.Wifis)
+                .Include(i => i.Lokaal).ThenInclude(l => l.Locatie)
+                .Include(i => i.Persoon)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(i => i.type == type && i.device_id == deviceId);
         }
 
@@ -92,6 +96,12 @@ namespace InventarisApp.Services
             existingInfo.PersoonId = info.PersoonId;
             existingInfo.aankoopdatum = info.aankoopdatum;
             existingInfo.eind_garantie = info.eind_garantie;
+            
+            // Printer specifieke velden
+            existingInfo.wachtwoord = info.wachtwoord;
+            existingInfo.toner = info.toner;
+            existingInfo.kleur = info.kleur;
+            existingInfo.nietjes = info.nietjes;
 
             // Optional Wifi update logic could go here if needed later
 

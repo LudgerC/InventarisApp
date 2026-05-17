@@ -26,6 +26,10 @@ namespace InventarisApp.Controllers
             ViewData["CurrentStatus"] = statusFilter;
             ViewData["CurrentSort"] = sortOrder;
 
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["RoleSortParm"] = sortOrder == "role_asc" ? "role_desc" : "role_asc";
+            ViewData["StatusSortParm"] = sortOrder == "status_asc" ? "status_desc" : "status_asc";
+
             ViewBag.Roles = await _context.Users.Select(u => u.Role).Distinct().OrderBy(r => r).ToListAsync();
 
             if (!string.IsNullOrEmpty(roleFilter))

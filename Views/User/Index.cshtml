@@ -2,8 +2,10 @@
 
 @{
     ViewData["Title"] = "Gebruikers Beheren";
+    ViewData["ContainerClass"] = "container-fluid";
 }
 
+<div class="mt-4" style="max-width: 95%; margin: 0 auto;">
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Gebruikers</h1>
     <a asp-action="Create" class="btn btn-primary"><i class="bi bi-person-plus"></i> Nieuwe Gebruiker</a>
@@ -29,11 +31,11 @@
 <div class="card shadow-sm mb-4 border-0">
     <div class="card-body bg-light rounded">
         <form asp-action="Index" method="get" class="row g-3 align-items-end">
-            <div class="col-md-3">
+            <div class="col-md-5">
                 <label class="form-label fw-bold"><i class="bi bi-search me-1"></i> Zoeken</label>
                 <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Gebruikersnaam...">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <label class="form-label fw-bold"><i class="bi bi-person-badge me-1"></i> Rol</label>
                 <select name="roleFilter" class="form-select">
                     <option value="">Alle rollen</option>
@@ -61,20 +63,6 @@
                     @if (ViewData["CurrentStatus"]?.ToString() == "Inactive") { <option value="Inactive" selected="selected">Geblokkeerd</option> } else { <option value="Inactive">Geblokkeerd</option> }
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold"><i class="bi bi-sort-alpha-down me-1"></i> Sorteren</label>
-                <select name="sortOrder" class="form-select">
-                    @{
-                        var currentSort = ViewData["CurrentSort"]?.ToString();
-                    }
-                    @if (string.IsNullOrEmpty(currentSort)) { <option value="" selected="selected">Gebruikersnaam (A-Z)</option> } else { <option value="">Gebruikersnaam (A-Z)</option> }
-                    @if (currentSort == "name_desc") { <option value="name_desc" selected="selected">Gebruikersnaam (Z-A)</option> } else { <option value="name_desc">Gebruikersnaam (Z-A)</option> }
-                    @if (currentSort == "role_asc") { <option value="role_asc" selected="selected">Rol (A-Z)</option> } else { <option value="role_asc">Rol (A-Z)</option> }
-                    @if (currentSort == "role_desc") { <option value="role_desc" selected="selected">Rol (Z-A)</option> } else { <option value="role_desc">Rol (Z-A)</option> }
-                    @if (currentSort == "status_asc") { <option value="status_asc" selected="selected">Status (Actief eerst)</option> } else { <option value="status_asc">Status (Actief eerst)</option> }
-                    @if (currentSort == "status_desc") { <option value="status_desc" selected="selected">Status (Geblokkeerd eerst)</option> } else { <option value="status_desc">Status (Geblokkeerd eerst)</option> }
-                </select>
-            </div>
             <div class="col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="bi bi-filter"></i> Toepassen
@@ -93,9 +81,30 @@
             <table class="table table-striped table-hover align-middle">
                 <thead>
                     <tr>
-                        <th>Gebruikersnaam</th>
-                        <th>Rol</th>
-                        <th>Status</th>
+                        <th>
+                            <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" asp-route-roleFilter="@ViewData["CurrentRole"]" class="text-white text-decoration-none d-flex align-items-center">
+                                Gebruikersnaam
+                                @if (string.IsNullOrEmpty(ViewData["CurrentSort"]?.ToString())) { <i class="bi bi-sort-alpha-down ms-1"></i> }
+                                else if (ViewData["CurrentSort"]?.ToString() == "name_desc") { <i class="bi bi-sort-alpha-up ms-1"></i> }
+                                else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="Index" asp-route-sortOrder="@ViewData["RoleSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" asp-route-roleFilter="@ViewData["CurrentRole"]" class="text-white text-decoration-none d-flex align-items-center">
+                                Rol
+                                @if (ViewData["CurrentSort"]?.ToString() == "role_asc") { <i class="bi bi-sort-alpha-down ms-1"></i> }
+                                else if (ViewData["CurrentSort"]?.ToString() == "role_desc") { <i class="bi bi-sort-alpha-up ms-1"></i> }
+                                else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="Index" asp-route-sortOrder="@ViewData["StatusSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" asp-route-roleFilter="@ViewData["CurrentRole"]" class="text-white text-decoration-none d-flex align-items-center">
+                                Status
+                                @if (ViewData["CurrentSort"]?.ToString() == "status_asc") { <i class="bi bi-sort-down ms-1"></i> }
+                                else if (ViewData["CurrentSort"]?.ToString() == "status_desc") { <i class="bi bi-sort-up ms-1"></i> }
+                                else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                            </a>
+                        </th>
                         <th>Acties</th>
                     </tr>
                 </thead>
@@ -170,4 +179,5 @@
             </table>
         </div>
     </div>
+</div>
 </div>

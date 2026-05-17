@@ -32,6 +32,11 @@ namespace InventarisApp.Controllers
             ViewData["CurrentType"] = typeFilter;
             ViewData["CurrentSort"] = sortOrder;
 
+            ViewData["TypeSortParm"] = String.IsNullOrEmpty(sortOrder) ? "type_desc" : "";
+            ViewData["IdSortParm"] = sortOrder == "id" ? "id_desc" : "id";
+            ViewData["MerkSortParm"] = sortOrder == "merk" ? "merk_desc" : "merk";
+            ViewData["NaamSortParm"] = sortOrder == "naam" ? "naam_desc" : "naam";
+
             ViewBag.Types = devices.Select(d => d.type).Where(t => !string.IsNullOrEmpty(t)).Distinct().OrderBy(t => t).ToList();
             ViewBag.Statuses = devices.Select(d => d.status).Where(s => !string.IsNullOrEmpty(s)).Distinct().OrderBy(s => s).ToList();
 
@@ -50,6 +55,7 @@ namespace InventarisApp.Controllers
                 searchString = searchString.ToLower();
                 filteredDevices = filteredDevices.Where(d => 
                     (d.merk != null && d.merk.ToLower().Contains(searchString)) ||
+                    (d.apparaatnaam != null && d.apparaatnaam.ToLower().Contains(searchString)) ||
                     (d.model != null && d.model.ToLower().Contains(searchString)) ||
                     (d.serial_number != null && d.serial_number.ToLower().Contains(searchString)) ||
                     (d.ip != null && d.ip.ToLower().Contains(searchString)) ||
@@ -64,6 +70,8 @@ namespace InventarisApp.Controllers
                 "id_desc" => filteredDevices.OrderByDescending(d => d.device_id),
                 "merk" => filteredDevices.OrderBy(d => d.merk).ThenBy(d => d.device_id),
                 "merk_desc" => filteredDevices.OrderByDescending(d => d.merk).ThenBy(d => d.device_id),
+                "naam" => filteredDevices.OrderBy(d => d.apparaatnaam).ThenBy(d => d.device_id),
+                "naam_desc" => filteredDevices.OrderByDescending(d => d.apparaatnaam).ThenBy(d => d.device_id),
                 _ => filteredDevices.OrderBy(d => d.type).ThenBy(d => d.device_id)
             };
 
@@ -111,6 +119,22 @@ namespace InventarisApp.Controllers
                 TempData["Error"] = $"Validatie fout: {errors}";
             }
             ViewBag.DeviceTypes = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
+            return View(info);
+        }
+
+        public async Task<IActionResult> Details(string type, int deviceId)
+        {
+            if (string.IsNullOrEmpty(type) || deviceId == 0)
+            {
+                return NotFound();
+            }
+
+            var info = await _deviceService.GetDeviceByIdAsync(type, deviceId);
+            if (info == null)
+            {
+                return NotFound();
+            }
+
             return View(info);
         }
 

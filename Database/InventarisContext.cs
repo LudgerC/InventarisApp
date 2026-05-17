@@ -64,7 +64,7 @@ namespace InventarisApp.Database
                 {
                     Id = 1,
                     Username = "admin",
-                    // Hashed "admin" using BCrypt
+                    // Hashed "admin" using BCrypt Bcrypt genereerd bij elke hash een nieuwe salt, daardoor is dit telkens verschillend, en pakt EF dit op in elke nieuwe migratie
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin"),
                     Role = "Admin",
                     IsActive = true

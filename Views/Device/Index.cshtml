@@ -2,9 +2,10 @@
 
 @{
     ViewData["Title"] = "Apparaten Overzicht";
+    ViewData["ContainerClass"] = "container-fluid";
 }
 
-<div class="container-fluid mt-4">
+<div class="mt-4" style="max-width: 95%; margin: 0 auto;">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-gradient" style="font-family: 'Outfit', sans-serif;">Apparaten Inventaris</h2>
         <div class="d-flex gap-2">
@@ -24,11 +25,11 @@
     <div class="card shadow-sm mb-4 border-0">
         <div class="card-body bg-light rounded">
             <form asp-action="Index" method="get" class="row g-3 align-items-end">
-                <div class="col-md-3">
+                <div class="col-md-5">
                     <label class="form-label fw-bold"><i class="bi bi-search me-1"></i> Zoeken</label>
-                    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Merk, model, serienummer...">
+                    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Merk, model, serienummer, naam...">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label class="form-label fw-bold"><i class="bi bi-pc-display me-1"></i> Type</label>
                     <select name="typeFilter" class="form-select">
                         <option value="">Alle types</option>
@@ -75,28 +76,6 @@
                         }
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-bold"><i class="bi bi-sort-alpha-down me-1"></i> Sorteren</label>
-                    <select name="sortOrder" class="form-select">
-                        @{
-                            var currentSort = ViewData["CurrentSort"]?.ToString();
-                        }
-                        @if (string.IsNullOrEmpty(currentSort))
-                        {
-                            <option value="" selected="selected">Type (A-Z)</option>
-                        }
-                        else
-                        {
-                            <option value="">Type (A-Z)</option>
-                        }
-
-                        @if (currentSort == "type_desc") { <option value="type_desc" selected="selected">Type (Z-A)</option> } else { <option value="type_desc">Type (Z-A)</option> }
-                        @if (currentSort == "merk") { <option value="merk" selected="selected">Merk (A-Z)</option> } else { <option value="merk">Merk (A-Z)</option> }
-                        @if (currentSort == "merk_desc") { <option value="merk_desc" selected="selected">Merk (Z-A)</option> } else { <option value="merk_desc">Merk (Z-A)</option> }
-                        @if (currentSort == "id") { <option value="id" selected="selected">ID (Oplopend)</option> } else { <option value="id">ID (Oplopend)</option> }
-                        @if (currentSort == "id_desc") { <option value="id_desc" selected="selected">ID (Aflopend)</option> } else { <option value="id_desc">ID (Aflopend)</option> }
-                    </select>
-                </div>
                 <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-filter"></i> Toepassen
@@ -113,10 +92,38 @@
         <table class="table table-hover table-striped align-middle mb-0">
             <thead class="table-dark">
                 <tr>
-                    <th>Type</th>
-                    <th>ID</th>
-                    <th>Merk</th>
-                    <th>Naam</th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["TypeSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" asp-route-typeFilter="@ViewData["CurrentType"]" class="text-white text-decoration-none d-flex align-items-center">
+                            Type
+                            @if (string.IsNullOrEmpty(ViewData["CurrentSort"]?.ToString())) { <i class="bi bi-sort-alpha-down ms-1"></i> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "type_desc") { <i class="bi bi-sort-alpha-up ms-1"></i> }
+                            else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["IdSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" asp-route-typeFilter="@ViewData["CurrentType"]" class="text-white text-decoration-none d-flex align-items-center">
+                            ID
+                            @if (ViewData["CurrentSort"]?.ToString() == "id") { <i class="bi bi-sort-numeric-down ms-1"></i> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "id_desc") { <i class="bi bi-sort-numeric-up ms-1"></i> }
+                            else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["MerkSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" asp-route-typeFilter="@ViewData["CurrentType"]" class="text-white text-decoration-none d-flex align-items-center">
+                            Merk
+                            @if (ViewData["CurrentSort"]?.ToString() == "merk") { <i class="bi bi-sort-alpha-down ms-1"></i> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "merk_desc") { <i class="bi bi-sort-alpha-up ms-1"></i> }
+                            else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["NaamSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-statusFilter="@ViewData["CurrentStatus"]" asp-route-typeFilter="@ViewData["CurrentType"]" class="text-white text-decoration-none d-flex align-items-center">
+                            Naam
+                            @if (ViewData["CurrentSort"]?.ToString() == "naam") { <i class="bi bi-sort-alpha-down ms-1"></i> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "naam_desc") { <i class="bi bi-sort-alpha-up ms-1"></i> }
+                            else { <i class="bi bi-arrow-down-up ms-1 text-white-50" style="font-size: 0.8em;"></i> }
+                        </a>
+                    </th>
                     <th>Serienummer</th>
                     <th>IP-adres</th>
                     <th>Status</th>
@@ -128,8 +135,14 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr>
-                        <td class="fw-bold">@item.type</td>
+                    <tr style="cursor: pointer;" onclick="window.location.href='@Url.Action("Details", "Device", new { type = item.type, deviceId = item.device_id })'" class="position-relative">
+                        <td class="fw-bold">
+                            @if (item.type == "Printer")
+                            {
+                                <i class="bi bi-printer-fill text-secondary me-1" title="Printer"></i>
+                            }
+                            @item.type
+                        </td>
                         <td>@item.device_id</td>
                         <td>@item.merk</td>
                         <td class="fw-medium text-primary">@(string.IsNullOrEmpty(item.apparaatnaam) ? "-" : item.apparaatnaam)</td>
@@ -160,12 +173,13 @@
                         <td>@(item.eind_garantie?.ToString("dd/MM/yyyy") ?? "N.v.t.")</td>
                         <td class="text-center">
                             <div class="btn-group">
-                                <a asp-action="Edit" asp-route-type="@item.type" asp-route-deviceId="@item.device_id" class="btn btn-sm btn-outline-secondary">
+                                <a asp-action="Edit" asp-route-type="@item.type" asp-route-deviceId="@item.device_id" class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation();">
                                     <i class="bi bi-pencil"></i> Bewerken
                                 </a>
                                 <button type="button" class="btn btn-sm btn-outline-danger delete-btn" 
                                         data-action="@Url.Action("Delete", "Device", new { type = item.type, deviceId = item.device_id })"
-                                        data-message="Weet je zeker dat je dit apparaat (@(item.apparaatnaam ?? item.merk)) wilt verwijderen?">
+                                        data-message="Weet je zeker dat je dit apparaat (@(item.apparaatnaam ?? item.merk)) wilt verwijderen?"
+                                        onclick="event.stopPropagation();">
                                     <i class="bi bi-trash"></i> Verwijderen
                                 </button>
                             </div>
