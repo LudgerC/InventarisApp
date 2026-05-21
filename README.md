@@ -25,6 +25,8 @@ dotnet ef database update
 
 ### 4. Data Import
 Om de data vanuit het Excel bestand naar de database te importeren, run het volgende commando:
+Gelieve dit slechts eenmalig uit te voeren, anders komen de inventarislijsten dubbel in de database.
+Desnoods de database eerst leegmaken.
 
 ```powershell
 # Importeer data vanuit Excel naar de database

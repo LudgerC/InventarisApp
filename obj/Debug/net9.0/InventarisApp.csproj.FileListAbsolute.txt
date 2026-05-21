@@ -936,3 +936,11 @@ C:\Users\adria\Documents\GitHub\inventarisapp\InventarisApp\obj\Debug\net9.0\com
 C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\obj\Debug\net9.0\compressed\es3zn7iq9g-{0}-0wovryxsom-0wovryxsom.gz
 C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\obj\Debug\net9.0\compressed\ygozjeudp7-{0}-vt5iatic7l-vt5iatic7l.gz
 C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\obj\Debug\net9.0\compressed\go678cz1c7-{0}-vt5iatic7l-vt5iatic7l.gz
+C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\bin\Debug\net9.0\ClosedXML.dll
+C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\bin\Debug\net9.0\ClosedXML.Parser.dll
+C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\bin\Debug\net9.0\DocumentFormat.OpenXml.dll
+C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\bin\Debug\net9.0\DocumentFormat.OpenXml.Framework.dll
+C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\bin\Debug\net9.0\ExcelNumberFormat.dll
+C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\bin\Debug\net9.0\RBush.dll
+C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\bin\Debug\net9.0\SixLabors.Fonts.dll
+C:\Users\azaha\Documents\School\GradPROG\2de_Jaar\stage\2.tijdens\InventarisApp\InventarisApp\bin\Debug\net9.0\System.IO.Packaging.dll

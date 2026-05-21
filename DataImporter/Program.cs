@@ -58,6 +58,7 @@ await SeedStudentenPCs(context, workbook);
 await SeedAdministratiePCs(context, workbook);
 await SeedProjectie(context, workbook);
 await SeedNetwerk(context, workbook);
+await SeedPrinters(context, workbook);
 
 Console.WriteLine("\nImport klaar!");
 
@@ -276,7 +277,14 @@ async Task<int?> GetPersoonId(InventarisContext dbContext, string? voornaam)
 {
     var name = CleanValue(voornaam);
     if (name == null) return null;
-    var persoon = await dbContext.Personen.FirstOrDefaultAsync(p => p.Naam.ToLower() == name.ToLower());
+
+    // Pak alleen het eerste woord (ervan uitgaande dat dit de voornaam is)
+    var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    if (parts.Length == 0) return null;
+    
+    var firstName = parts[0].ToLower();
+
+    var persoon = await dbContext.Personen.FirstOrDefaultAsync(p => p.Naam.ToLower() == firstName);
     return persoon?.ID;
 }
 
@@ -541,6 +549,75 @@ async Task SeedNetwerk(InventarisContext dbContext, XLWorkbook wb)
             serial_number = CleanValue(row.Cell(snIdx).GetString()),
             LokaalId = await GetLokaalId(dbContext, row.Cell(lokaalIdx).GetString()),
             ip = CleanValue(row.Cell(ipIdx).GetString()),
+            status = "Active"
+        };
+        dbContext.Infos.Add(info);
+    }
+    await dbContext.SaveChangesAsync();
+}
+
+async Task SeedPrinters(InventarisContext dbContext, XLWorkbook wb)
+{
+    Console.WriteLine("Seeding Printers...");
+    var sheet = wb.Worksheet("Printers");
+    var rows = sheet.RangeUsed().RowsUsed().Skip(1);
+
+    int ipIdx = GetCol(sheet, "IP");
+    if (ipIdx == 0) ipIdx = GetCol(sheet, "IPadres");
+    
+    int naamIdx = GetCol(sheet, "Naam");
+    int wwIdx = GetCol(sheet, "Wachtwoord");
+    int lokaalIdx = GetCol(sheet, "Lokaal");
+    int snIdx = GetCol(sheet, "Serienummer");
+    int tonerIdx = GetCol(sheet, "Toner");
+    int kleurIdx = GetCol(sheet, "Kleur");
+    int nietjesIdx = GetCol(sheet, "Nietjes");
+
+    var type = "Printer";
+    var existingType = await dbContext.Devices.FirstOrDefaultAsync(d => d.type == type);
+    if (existingType == null)
+    {
+        dbContext.Devices.Add(new InventarisApp.Models.Device { type = type });
+        await dbContext.SaveChangesAsync();
+    }
+
+    foreach (var row in rows)
+    {
+        var naam = CleanValue(row.Cell(naamIdx).GetString());
+        var ip = CleanValue(row.Cell(ipIdx).GetString());
+        
+        if (string.IsNullOrEmpty(naam) && string.IsNullOrEmpty(ip)) continue;
+
+        var device = new InventarisApp.Models.Device { type = type };
+        dbContext.Devices.Add(device);
+        await dbContext.SaveChangesAsync();
+
+        string kleurStr = CleanValue(row.Cell(kleurIdx).GetString());
+        bool? heeftKleur = null;
+        if (!string.IsNullOrEmpty(kleurStr))
+        {
+            heeftKleur = (kleurStr == "1" || kleurStr.ToLower() == "true" || kleurStr.ToLower() == "ja");
+        }
+
+        string nietjesStr = CleanValue(row.Cell(nietjesIdx).GetString());
+        bool? heeftNietjes = null;
+        if (!string.IsNullOrEmpty(nietjesStr))
+        {
+            heeftNietjes = (nietjesStr == "1" || nietjesStr.ToLower() == "true" || nietjesStr.ToLower() == "ja");
+        }
+
+        var info = new InventarisApp.Models.Info
+        {
+            type = type,
+            device_id = device.device_id,
+            ip = ip,
+            apparaatnaam = naam,
+            wachtwoord = CleanValue(row.Cell(wwIdx).GetString()),
+            LokaalId = await GetLokaalId(dbContext, row.Cell(lokaalIdx).GetString()),
+            serial_number = CleanValue(row.Cell(snIdx).GetString()),
+            toner = CleanValue(row.Cell(tonerIdx).GetString()),
+            kleur = heeftKleur,
+            nietjes = heeftNietjes,
             status = "Active"
         };
         dbContext.Infos.Add(info);

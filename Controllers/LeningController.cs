@@ -22,10 +22,65 @@ namespace InventarisApp.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string statusFilter, string sortOrder)
         {
             var leningen = await _leningService.GetAllLeningenAsync();
-            return View(leningen);
+            IEnumerable<Lening> filteredLeningen = leningen;
+
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentStatus"] = statusFilter;
+            ViewData["CurrentSort"] = sortOrder;
+
+            ViewData["IdSortParm"] = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
+            ViewData["PersoonSortParm"] = sortOrder == "persoon_asc" ? "persoon_desc" : "persoon_asc";
+            ViewData["ApparaatSortParm"] = sortOrder == "apparaat_asc" ? "apparaat_desc" : "apparaat_asc";
+            ViewData["StartSortParm"] = sortOrder == "start_asc" ? "start_desc" : "start_asc";
+            ViewData["EindSortParm"] = sortOrder == "eind_asc" ? "eind_desc" : "eind_asc";
+            ViewData["StatusSortParm"] = sortOrder == "status_asc" ? "status_desc" : "status_asc";
+
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                if (statusFilter == "Active")
+                {
+                    filteredLeningen = filteredLeningen.Where(l => !l.einddatum.HasValue || l.einddatum.Value.Date > DateTime.Now.Date);
+                }
+                else if (statusFilter == "Afgerond")
+                {
+                    filteredLeningen = filteredLeningen.Where(l => l.einddatum.HasValue && l.einddatum.Value.Date <= DateTime.Now.Date);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.ToLower();
+                filteredLeningen = filteredLeningen.Where(l => 
+                    (l.Persoon != null && (l.Persoon.Naam.ToLower().Contains(searchString) || l.Persoon.Achternaam.ToLower().Contains(searchString))) ||
+                    (l.Device != null && (
+                        (l.Device.type != null && l.Device.type.ToLower().Contains(searchString)) || 
+                        (l.Device.Infos != null && l.Device.Infos.Any(i => i.apparaatnaam != null && i.apparaatnaam.ToLower().Contains(searchString))) ||
+                        (l.Device.Infos != null && l.Device.Infos.Any(i => i.merk != null && i.merk.ToLower().Contains(searchString)))
+                    )) ||
+                    l.ID.ToString().Contains(searchString)
+                );
+            }
+
+            filteredLeningen = sortOrder switch
+            {
+                "id_desc" => filteredLeningen.OrderByDescending(l => l.ID),
+                "persoon_asc" => filteredLeningen.OrderBy(l => l.Persoon?.Naam),
+                "persoon_desc" => filteredLeningen.OrderByDescending(l => l.Persoon?.Naam),
+                "apparaat_asc" => filteredLeningen.OrderBy(l => l.Device?.type),
+                "apparaat_desc" => filteredLeningen.OrderByDescending(l => l.Device?.type),
+                "start_asc" => filteredLeningen.OrderBy(l => l.startdatum),
+                "start_desc" => filteredLeningen.OrderByDescending(l => l.startdatum),
+                "eind_asc" => filteredLeningen.OrderBy(l => l.einddatum ?? DateTime.MaxValue),
+                "eind_desc" => filteredLeningen.OrderByDescending(l => l.einddatum ?? DateTime.MaxValue),
+                "status_asc" => filteredLeningen.OrderBy(l => l.einddatum.HasValue && l.einddatum.Value.Date <= DateTime.Now.Date),
+                "status_desc" => filteredLeningen.OrderByDescending(l => l.einddatum.HasValue && l.einddatum.Value.Date <= DateTime.Now.Date),
+                _ => filteredLeningen.OrderBy(l => l.ID)
+            };
+
+            return View(filteredLeningen.ToList());
         }
 
         public async Task<IActionResult> Details(int id)

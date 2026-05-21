@@ -52,6 +52,17 @@ namespace InventarisApp.Models
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? eind_garantie { get; set; }
+
+        // Printer specifieke eigenschappen
+        [MaxLength(100)]
+        public string? wachtwoord { get; set; }
+        
+        [MaxLength(100)]
+        public string? toner { get; set; }
+        
+        public bool? kleur { get; set; }
+        
+        public bool? nietjes { get; set; }
         
         // Navigation properties
         [ForeignKey("device_id")]

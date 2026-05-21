@@ -4,6 +4,8 @@ using InventarisApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ClosedXML.Excel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,19 +23,9 @@ namespace InventarisApp.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string searchString, string statusFilter, string typeFilter, string sortOrder)
+        private IEnumerable<Info> GetFilteredAndSortedDevices(IEnumerable<Info> devices, string searchString, string statusFilter, string typeFilter, string sortOrder)
         {
-            var devices = await _deviceService.GetAllDevicesAsync();
-            
             IEnumerable<Info> filteredDevices = devices;
-
-            ViewData["CurrentFilter"] = searchString;
-            ViewData["CurrentStatus"] = statusFilter;
-            ViewData["CurrentType"] = typeFilter;
-            ViewData["CurrentSort"] = sortOrder;
-
-            ViewBag.Types = devices.Select(d => d.type).Where(t => !string.IsNullOrEmpty(t)).Distinct().OrderBy(t => t).ToList();
-            ViewBag.Statuses = devices.Select(d => d.status).Where(s => !string.IsNullOrEmpty(s)).Distinct().OrderBy(s => s).ToList();
 
             if (!string.IsNullOrEmpty(typeFilter))
             {
@@ -50,6 +42,7 @@ namespace InventarisApp.Controllers
                 searchString = searchString.ToLower();
                 filteredDevices = filteredDevices.Where(d => 
                     (d.merk != null && d.merk.ToLower().Contains(searchString)) ||
+                    (d.apparaatnaam != null && d.apparaatnaam.ToLower().Contains(searchString)) ||
                     (d.model != null && d.model.ToLower().Contains(searchString)) ||
                     (d.serial_number != null && d.serial_number.ToLower().Contains(searchString)) ||
                     (d.ip != null && d.ip.ToLower().Contains(searchString)) ||
@@ -57,17 +50,94 @@ namespace InventarisApp.Controllers
                 );
             }
 
-            filteredDevices = sortOrder switch
+            return sortOrder switch
             {
                 "type_desc" => filteredDevices.OrderByDescending(d => d.type).ThenBy(d => d.device_id),
                 "id" => filteredDevices.OrderBy(d => d.device_id),
                 "id_desc" => filteredDevices.OrderByDescending(d => d.device_id),
                 "merk" => filteredDevices.OrderBy(d => d.merk).ThenBy(d => d.device_id),
                 "merk_desc" => filteredDevices.OrderByDescending(d => d.merk).ThenBy(d => d.device_id),
+                "naam" => filteredDevices.OrderBy(d => d.apparaatnaam).ThenBy(d => d.device_id),
+                "naam_desc" => filteredDevices.OrderByDescending(d => d.apparaatnaam).ThenBy(d => d.device_id),
                 _ => filteredDevices.OrderBy(d => d.type).ThenBy(d => d.device_id)
             };
+        }
+
+        public async Task<IActionResult> Index(string searchString, string statusFilter, string typeFilter, string sortOrder)
+        {
+            var devices = await _deviceService.GetAllDevicesAsync();
+            
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentStatus"] = statusFilter;
+            ViewData["CurrentType"] = typeFilter;
+            ViewData["CurrentSort"] = sortOrder;
+
+            ViewData["TypeSortParm"] = String.IsNullOrEmpty(sortOrder) ? "type_desc" : "";
+            ViewData["IdSortParm"] = sortOrder == "id" ? "id_desc" : "id";
+            ViewData["MerkSortParm"] = sortOrder == "merk" ? "merk_desc" : "merk";
+            ViewData["NaamSortParm"] = sortOrder == "naam" ? "naam_desc" : "naam";
+
+            ViewBag.Types = devices.Select(d => d.type).Where(t => !string.IsNullOrEmpty(t)).Distinct().OrderBy(t => t).ToList();
+            ViewBag.Statuses = devices.Select(d => d.status).Where(s => !string.IsNullOrEmpty(s)).Distinct().OrderBy(s => s).ToList();
+
+            var filteredDevices = GetFilteredAndSortedDevices(devices, searchString, statusFilter, typeFilter, sortOrder);
 
             return View(filteredDevices.ToList());
+        }
+
+        public async Task<IActionResult> ExportToExcel(string searchString, string statusFilter, string typeFilter, string sortOrder)
+        {
+            var devices = await _deviceService.GetAllDevicesAsync();
+            var filteredDevices = GetFilteredAndSortedDevices(devices, searchString, statusFilter, typeFilter, sortOrder).ToList();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Devices");
+
+            // Header row
+            var properties = typeof(Info).GetProperties().Where(p => 
+                p.Name != "Device" && p.Name != "Lokaal" && p.Name != "Persoon" && p.Name != "Wifis").ToList();
+            
+            int col = 1;
+            foreach (var prop in properties)
+            {
+                worksheet.Cell(1, col++).Value = prop.Name;
+            }
+            worksheet.Cell(1, col++).Value = "LokaalNaam";
+            worksheet.Cell(1, col++).Value = "PersoonVoornaam";
+            worksheet.Cell(1, col++).Value = "PersoonAchternaam";
+
+            var headerRow = worksheet.Row(1);
+            headerRow.Style.Font.Bold = true;
+            headerRow.Style.Fill.BackgroundColor = XLColor.LightGray;
+
+            // Data rows
+            int row = 2;
+            foreach (var device in filteredDevices)
+            {
+                col = 1;
+                foreach (var prop in properties)
+                {
+                    var val = prop.GetValue(device);
+                    worksheet.Cell(row, col++).Value = val != null ? val.ToString() : "";
+                }
+                
+                worksheet.Cell(row, col++).Value = device.Lokaal != null ? device.Lokaal.Naam : "";
+                worksheet.Cell(row, col++).Value = device.Persoon != null ? device.Persoon.Naam : "";
+                worksheet.Cell(row, col++).Value = device.Persoon != null ? device.Persoon.Achternaam : "";
+
+                row++;
+            }
+
+            worksheet.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            var content = stream.ToArray();
+
+            return File(
+                content,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "Devices_Export.xlsx");
         }
 
         public async Task<IActionResult> Create()
@@ -111,6 +181,22 @@ namespace InventarisApp.Controllers
                 TempData["Error"] = $"Validatie fout: {errors}";
             }
             ViewBag.DeviceTypes = await _context.Devices.Select(d => d.type).Distinct().OrderBy(t => t).ToListAsync();
+            return View(info);
+        }
+
+        public async Task<IActionResult> Details(string type, int deviceId)
+        {
+            if (string.IsNullOrEmpty(type) || deviceId == 0)
+            {
+                return NotFound();
+            }
+
+            var info = await _deviceService.GetDeviceByIdAsync(type, deviceId);
+            if (info == null)
+            {
+                return NotFound();
+            }
+
             return View(info);
         }
 
